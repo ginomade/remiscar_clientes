@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">REMISCAR</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_web">WebActivity</string>
+    <string name="title_activity_reclamos">ReclamosActivity</string>
+    <bool name="isTablet">false</bool>
+
+</resources>
