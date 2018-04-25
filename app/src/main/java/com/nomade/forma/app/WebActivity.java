@@ -1,26 +1,18 @@
 package com.nomade.forma.app;
 
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -33,23 +25,8 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
-
-public class WebActivity extends ActionBarActivity {
+public class WebActivity extends AppCompatActivity {
 
     public WebView webView;
     public String imei;
@@ -64,7 +41,7 @@ public class WebActivity extends ActionBarActivity {
     public int flgOrigen;//flag para actualizacion de origen.php
     String telCompleto;
     Handler myHandler;
-    int flg_mens=0; // flag para mensajes
+    int flg_mens = 0; // flag para mensajes
     //Button buttonMisViajes;
 
     @Override
@@ -77,21 +54,21 @@ public class WebActivity extends ActionBarActivity {
         Configuration config = getResources().getConfiguration();
         if (config.smallestScreenWidthDp >= 600) {
             imei = getMacAdd();
-        }else{
+        } else {
             //obtengo imei
             imei = getPhoneImei();//"359781041848146"
         }
 
 
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WebActivity.this);
-        webcontent = prefs.getString("webresult","Error.");
-        telefono = prefs.getString("celular","");
-        prefijo = prefs.getString("car","");
+        webcontent = prefs.getString("webresult", "Error.");
+        telefono = prefs.getString("celular", "");
+        prefijo = prefs.getString("car", "");
         telCompleto = prefijo + telefono;
 
         webView = (WebView) findViewById(R.id.webView);
         webView.setVisibility(View.VISIBLE);
-        String webData = "<?xml version='1.0' encoding='utf-8'?><html><body>"+webcontent+" </body></html>";
+        String webData = "<?xml version='1.0' encoding='utf-8'?><html><body>" + webcontent + " </body></html>";
         webView.loadData(webData, "text/html; charset=UTF-8", null);
 
 
@@ -102,7 +79,7 @@ public class WebActivity extends ActionBarActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!WebActivity.this.isFinishing() && flgOrigen==0) {
+                while (!WebActivity.this.isFinishing() && flgOrigen == 0) {
                     try {
                         Thread.sleep(5000);
                         myHandler.post(mMyRunnable);
@@ -113,11 +90,10 @@ public class WebActivity extends ActionBarActivity {
             }
         }).start();
 
-        Ret = (Button)findViewById(R.id.buttonRet);
+        Ret = (Button) findViewById(R.id.buttonRet);
         Ret.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 //vuelvo a pantalla inicial
                 try {
                     Intent intent = new Intent(WebActivity.this, MainActivity.class);
@@ -137,8 +113,7 @@ public class WebActivity extends ActionBarActivity {
                 boolean shouldOverride = false;
                 if (url.contains("cancelar.php") || url.contains("reclamar.php")) {
                     myHandler.postDelayed(mMyRunnable, 3000);
-                }
-                else if(url.contains("registro.php")){
+                } else if (url.contains("registro.php")) {
                     flgOrigen = 1;
                 }
 
@@ -150,16 +125,16 @@ public class WebActivity extends ActionBarActivity {
 
     }
 
-    public String isTablet(){
-        TelephonyManager manager = (TelephonyManager)WebActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
-        if(manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE){
+    public String isTablet() {
+        TelephonyManager manager = (TelephonyManager) WebActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
             return "Tablet";
-        }else{
+        } else {
             return "Mobile";
         }
     }
 
-    public String getMacAdd(){
+    public String getMacAdd() {
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         String macAddress = wInfo.getMacAddress();
@@ -167,7 +142,7 @@ public class WebActivity extends ActionBarActivity {
     }
 
     //Obtener numero de imei
-    private String getPhoneImei(){
+    private String getPhoneImei() {
         TelephonyManager mTelephonyManager;
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         return mTelephonyManager.getDeviceId();
@@ -175,20 +150,18 @@ public class WebActivity extends ActionBarActivity {
 
 
     //Here's a runnable/handler combo
-    private Runnable mMyRunnable = new Runnable()
-    {
+    private Runnable mMyRunnable = new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
 
             boolean bBloq = webcontent.contains("bloqueado");
-            if(bBloq){
+            if (bBloq) {
                 Intent intent = new Intent(WebActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
 
-            }else{
+            } else {
 
                 //nuevo mensaje
                 Ion.with(WebActivity.this)
@@ -236,15 +209,18 @@ public class WebActivity extends ActionBarActivity {
                 cargarOrigen();
 
             }
-            if (flgCiclo ==0){flgCiclo = 1;}
-            else{flgCiclo = 2;}
+            if (flgCiclo == 0) {
+                flgCiclo = 1;
+            } else {
+                flgCiclo = 2;
+            }
 
         }
     };
 
 
     // tarea asincrona de carga de origen.php
-    public void cargarOrigen(){
+    public void cargarOrigen() {
         try {
             Ion.with(WebActivity.this)
                     .load("http://carlitosbahia.dynns.com/movil/origen.php")
@@ -257,7 +233,7 @@ public class WebActivity extends ActionBarActivity {
                         public void onCompleted(Exception e, String result) {
                             Log.e("Remiscar ", "ORIGEN - " + result);
                             try {
-                                webView.loadData(result ,"text/html; charset=UTF-8", null);
+                                webView.loadData(result, "text/html; charset=UTF-8", null);
                                 webcontent = result;
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -265,8 +241,8 @@ public class WebActivity extends ActionBarActivity {
 
                         }
                     });
-        }catch(Exception e){
-            Log.e("Remiscar ", "Web Origen ERR - "+e);
+        } catch (Exception e) {
+            Log.e("Remiscar ", "Web Origen ERR - " + e);
         }
     }
 
@@ -281,12 +257,12 @@ public class WebActivity extends ActionBarActivity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        try{
+        try {
             myHandler.removeCallbacks(mMyRunnable);
-        }catch(NullPointerException e){
-            Log.e("Remiscar ", "ERR - "+e);
+        } catch (NullPointerException e) {
+            Log.e("Remiscar ", "ERR - " + e);
         }
     }
 }

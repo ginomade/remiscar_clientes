@@ -1,22 +1,18 @@
 package com.nomade.forma.app;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.Toast;
 
 // pantalla de datos de novedades para el movil
-public class NovedadesActivity extends Activity {
+public class NovedadesActivity extends AppCompatActivity {
 
     WebView mWebView;
     private static final String URL = "http://carlitosbahia.dynns.com/movil/Mmensajes.php";
@@ -32,7 +28,7 @@ public class NovedadesActivity extends Activity {
         SharedPreferences settings = getSharedPreferences("RemisData", 0);
         String imei = settings.getString("imei", "");
 
-        params = "?IMEI="+imei;
+        params = "?IMEI=" + imei;
 
         mWebView = (WebView) findViewById(R.id.webView);
 
@@ -59,21 +55,20 @@ public class NovedadesActivity extends Activity {
 
     }
 
-    WebViewClient yourWebClient = new WebViewClient(){
+    WebViewClient yourWebClient = new WebViewClient() {
         // you tell the webclient you want to catch when a url is about to load
         @Override
-        public boolean shouldOverrideUrlLoading(WebView  view, String  url){
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
             //mWebView.loadUrl(url);
             return true;
         }
+
         // here you execute an action when the URL you want is about to load
         @Override
-        public void onLoadResource(WebView  view, String  url){
+        public void onLoadResource(WebView view, String url) {
 
         }
     };
-
-
 
 
     @Override

@@ -1,14 +1,14 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 27
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 19
-        versionCode 13
-        versionName "2.2"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 14
+        versionName "3.0"
     }
     buildTypes {
         release {
@@ -20,9 +20,12 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:19.0.0'
+    compile 'com.android.support:appcompat-v7:27.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.koushikdutta.ion:ion:2.+'
+    compile 'com.google.maps.android:android-maps-utils:0.3+'
+    compile 'com.google.android.gms:play-services:11.6.2'
+    compile 'org.greenrobot:eventbus:3.1.1'
 }
 
 

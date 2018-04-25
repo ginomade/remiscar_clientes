@@ -1,24 +1,15 @@
 package com.nomade.forma.app;
 
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -27,30 +18,11 @@ import android.widget.Toast;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 //pantalla de datos de viajes
-public class ReclamosActivity extends Activity {
+public class ReclamosActivity extends AppCompatActivity {
 
     WebView mWebView;
     public String imei;
@@ -76,8 +48,8 @@ public class ReclamosActivity extends Activity {
         imei = getPhoneImei();
         telefono = settings.getString("celular", "");
         prefijo = settings.getString("car", "");
-        Log.e("Remiscar:", "Reclamos  - celu "+telefono);
-        Log.e("Remiscar:", "Reclamos  - imei "+imei);
+        Log.e("Remiscar:", "Reclamos  - celu " + telefono);
+        Log.e("Remiscar:", "Reclamos  - imei " + imei);
         final String telCompleto = prefijo + telefono;
 
         ll_mensaje = (LinearLayout) findViewById(R.id.mensaje);
@@ -88,13 +60,13 @@ public class ReclamosActivity extends Activity {
 
         mostrarForm();
 
-        send = (Button)findViewById(R.id.buttonSend);
+        send = (Button) findViewById(R.id.buttonSend);
         send.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
 
-                    //asReclamos(imei,  telCompleto, mensaje.getText().toString());
+                //asReclamos(imei,  telCompleto, mensaje.getText().toString());
                 try {
                     String texto = URLEncoder.encode(mensaje.getText().toString(), "utf-8");
                     if (texto.equals("")) {
@@ -118,7 +90,7 @@ public class ReclamosActivity extends Activity {
         //asReclamos(imei, telefono);
 
         //
-        Ret = (Button)findViewById(R.id.buttonRet);
+        Ret = (Button) findViewById(R.id.buttonRet);
         Ret.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -131,7 +103,7 @@ public class ReclamosActivity extends Activity {
     }
 
 
-    private void asReclamos(String imei, String celu, String mensaje){
+    private void asReclamos(String imei, String celu, String mensaje) {
         Ion.with(ReclamosActivity.this)
                 .load("http://carlitosbahia.dynns.com/movil/reclamosMovil.php?&IMEI=" + imei + "&Celular=" + celu + "&Descripcion=" + mensaje)
 
@@ -156,11 +128,13 @@ public class ReclamosActivity extends Activity {
                     }
                 });
     }
-    private String getPhoneImei(){
+
+    private String getPhoneImei() {
         TelephonyManager mTelephonyManager;
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         return mTelephonyManager.getDeviceId();
     }
+
     @Override
     protected void onPause() {
         // TODO Auto-generated method stub
@@ -186,11 +160,12 @@ public class ReclamosActivity extends Activity {
         finish();
     }
 
-    private void mostrarForm(){
+    private void mostrarForm() {
         ll_confirmacion.setVisibility(View.GONE);
         ll_mensaje.setVisibility(View.VISIBLE);
     }
-    private void mostrarConf(){
+
+    private void mostrarConf() {
         ll_confirmacion.setVisibility(View.VISIBLE);
         ll_mensaje.setVisibility(View.GONE);
     }
