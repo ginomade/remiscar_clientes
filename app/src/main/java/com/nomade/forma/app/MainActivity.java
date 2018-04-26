@@ -49,8 +49,8 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    public EditText editTextMens; //= (EditText) findViewById(R.id.editTextMens);
-    public EditText editTextStatus; //= (EditText) findViewById(R.id.editTextStatus);
+    public EditText editTextMens;
+    public EditText editTextStatus;
     public EditText editTextFecha;
     public EditText editTextHora;
     public EditText editTexCelular;
