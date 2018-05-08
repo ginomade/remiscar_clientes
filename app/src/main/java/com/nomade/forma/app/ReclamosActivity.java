@@ -2,11 +2,9 @@ package com.nomade.forma.app;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -17,6 +15,12 @@ import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.nomade.forma.app.events.ReclamosEvent;
+import com.nomade.forma.app.events.ReservasEvent;
+import com.nomade.forma.app.utils.ServiceUtils;
+import com.nomade.forma.app.utils.SharedPrefsUtil;
+
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -34,6 +38,9 @@ public class ReclamosActivity extends AppCompatActivity {
     String TAG_SUCCESS = "result";
     LinearLayout ll_mensaje, ll_confirmacion;
 
+    Context mContext;
+    SharedPrefsUtil sharedPrefs;
+
     //JSONParser jsonParser = new JSONParser();
 
     // String imei, resp;
@@ -43,11 +50,12 @@ public class ReclamosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reclamos);
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(ReclamosActivity.this);//getSharedPreferences("RemisData", 0);
+        mContext = ReclamosActivity.this;
+        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         //imei = settings.getString("imei", "");
-        imei = getPhoneImei();
-        telefono = settings.getString("celular", "");
-        prefijo = settings.getString("car", "");
+        imei = sharedPrefs.getString("imei", "");
+        telefono = sharedPrefs.getString("celular", "");
+        prefijo = sharedPrefs.getString("car", "");
         Log.e("Remiscar:", "Reclamos  - celu " + telefono);
         Log.e("Remiscar:", "Reclamos  - imei " + imei);
         final String telCompleto = prefijo + telefono;
@@ -73,8 +81,7 @@ public class ReclamosActivity extends AppCompatActivity {
                         Toast.makeText(ReclamosActivity.this, "Escriba el mensaje.", Toast.LENGTH_SHORT).show();
                         send.setText("Escribir y enviar!!!");
                     } else {
-
-                        asReclamos(imei, telCompleto, texto);
+                        ServiceUtils.getReclamos(mContext, imei, telCompleto, texto);
                     }
 
                 } catch (UnsupportedEncodingException e) {
@@ -86,10 +93,6 @@ public class ReclamosActivity extends AppCompatActivity {
 
         });
 
-
-        //asReclamos(imei, telefono);
-
-        //
         Ret = (Button) findViewById(R.id.buttonRet);
         Ret.setOnClickListener(new View.OnClickListener() {
 
@@ -102,43 +105,26 @@ public class ReclamosActivity extends AppCompatActivity {
         });
     }
 
+    @Subscribe()
+    public void processReservas(ReclamosEvent data) {
 
-    private void asReclamos(String imei, String celu, String mensaje) {
-        Ion.with(ReclamosActivity.this)
-                .load("http://carlitosbahia.dynns.com/movil/reclamosMovil.php?&IMEI=" + imei + "&Celular=" + celu + "&Descripcion=" + mensaje)
+        try {
+            if (data.getDataString().contains("ok")) {
+                Toast.makeText(ReclamosActivity.this, "Reclamo enviado.", Toast.LENGTH_SHORT).show();
+                mostrarConf();
+            } else {
+                Toast.makeText(ReclamosActivity.this, "Error al enviar el mensaje.", Toast.LENGTH_SHORT).show();
 
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar:", "Reclamos  - " + result);
-                        try {
-                            if (result.contains("ok")) {
-                                Toast.makeText(ReclamosActivity.this, "Reclamo enviado.", Toast.LENGTH_SHORT).show();
-                                mostrarConf();
-                            } else {
-                                Toast.makeText(ReclamosActivity.this, "Error al enviar el mensaje.", Toast.LENGTH_SHORT).show();
+            }
 
-                            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
 
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-
-                    }
-                });
-    }
-
-    private String getPhoneImei() {
-        TelephonyManager mTelephonyManager;
-        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        return mTelephonyManager.getDeviceId();
     }
 
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
-
         super.onPause();
 
         finish();
@@ -146,8 +132,6 @@ public class ReclamosActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
-
         super.onDestroy();
 
         finish();

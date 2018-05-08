@@ -29,11 +29,72 @@
                 android:textIsSelectable="false"
                 android:textSize="22dp" />
 
+            <LinearLayout
+                android:id="@+id/ll_botones"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@id/textView"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonHome"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="#0288D1">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_home_white_24dp"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonWork"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="#0288D1">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_work_white_24dp"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonOtro"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="#0288D1">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_youtube_searched_for_white_24dp"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Otro:"
+                android:id="@+id/textViewOtros"
+                android:typeface="sans"
+                android:layout_below="@id/ll_botones"
+                android:textIsSelectable="false"
+                android:textSize="18dp" />
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:inputType="textMultiLine"
-                android:layout_below="@id/textView"
+                android:layout_below="@id/textViewOtros"
                 android:ems="10"
                 android:id="@+id/editTextMens"
                 android:layout_gravity="center_horizontal"
@@ -46,7 +107,7 @@
                 android:id="@+id/buttonEnviar"
                 android:layout_gravity="center_horizontal"
                 android:layout_below="@id/editTextMens"
-                android:background="#4863a0"
+                android:background="#0288D1"
                 android:textColor="#d5d9ea"
                 android:textSize="30dp"
                 android:layout_marginTop="12dp"
@@ -61,17 +122,17 @@
 
 
             <Button
+                android:id="@+id/buttonMensajes"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Ver Mis Viajes"
-                android:id="@+id/buttonMisViajes"
-                android:layout_gravity="center_horizontal"
-                android:background="#4863a0"
-                android:textColor="#d5d9ea"
                 android:layout_above="@id/buttonDatos"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#0288D1"
+                android:text="Mensajes"
+                android:textColor="#d5d9ea"
                 android:textSize="30dp"
-                android:textStyle="bold"
-                android:layout_marginTop="10dp" />
+                android:textStyle="bold" />
 
             <Button
                 android:layout_width="fill_parent"
@@ -80,7 +141,7 @@
                 android:id="@+id/buttonDatos"
                 android:layout_gravity="center_horizontal"
                 android:layout_alignParentBottom="true"
-                android:background="#4863a0"
+                android:background="#0288D1"
                 android:textColor="#d5d9ea"
                 android:textSize="30dp"
                 android:textStyle="bold"

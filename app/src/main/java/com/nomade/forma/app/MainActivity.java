@@ -1,39 +1,46 @@
 package com.nomade.forma.app;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationListener;
 import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
+import com.nomade.forma.app.events.MensajesEvent;
+import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
+import com.nomade.forma.app.utils.GooglePlayServicesHelper;
+import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -43,7 +50,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Calendar;
 
 
@@ -60,9 +66,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String prefijo = "";
     public String imei;
     public Button Enviar;
-    public Button Viajes;
-    public Button Reclamos;
-    private LocationManager locationManager;
+    public Button buttonMensajes;
     public Double lat;
     public Double lon;
     public String url;
@@ -79,6 +83,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     Context mContext;
     SharedPrefsUtil sharedPrefs;
+    private GooglePlayServicesHelper locationHelper;
+    WebView vViajesView;
+    WebViewClient yourWebClient;
+    RelativeLayout vHomeButton;
+    RelativeLayout vWorkButton;
+    RelativeLayout vOtrosButton;
+
+    Button vButtonDatos;
+
+    String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_SMS,
+            Manifest.permission.READ_PHONE_NUMBERS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    static final String HOME = "CASA";
+    static final String WORK = "TRABAJO";
+    static final String OTHER = "ALTERNATIVO";
+
+
+    private static final int MY_PERMISSIONS_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,77 +112,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         editTextStatus = (EditText) findViewById(R.id.editTextStatus);
         editTexUbicacion = (EditText) findViewById(R.id.editTextUbicacion);
         textStatus = (TextView) findViewById(R.id.textStatus);
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        vViajesView = (WebView) findViewById(R.id.wv_mensajes);
+        setupWebView();
         mHandler = new android.os.Handler();
 
         mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
+        locationHelper = new GooglePlayServicesHelper(this, true);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        }
+
+
 
         boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
 
-        /********** get Gps location service LocationManager object ***********/
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        try {
-            // identificador del equipo segun tipo
-            Configuration config = getResources().getConfiguration();
-            if (config.smallestScreenWidthDp >= 600) {
-                imei = getMacAdd();
-
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, this);
-                Log.v("start", "entro por tab");
-            } else {
-
-                //Si hay conexion de WIFI pongo el flag a 1.
-                if (isWifiOnline().equals("wifi")) {
-                    estadoWifi = "1";
-                }
-
-                telefono = getPhoneNumber();
-                //obtengo imei
-                imei = getPhoneImei();//"359781041848146"
-
-                /* CAL METHOD requestLocationUpdates */
-                if (imei.equals("000000000000000")) {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, this);
-                } else {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 10, this);
-                }
-            }
-            //obtengo numero del celular
-            editTexCelular = (EditText) findViewById(R.id.editTextCelular);
-            editTextCar = (EditText) findViewById(R.id.editTextCar);
-
-            if (telefono.equals("") && prefs.getString("celular", "").equals("")) {
-                editTexCelular.setFocusable(true);
-                editTexCelular.setClickable(true);
-                editTexCelular.setEnabled(true);
-                editTextCar.setFocusable(true);
-                editTextCar.setClickable(true);
-                editTextCar.setEnabled(true);
-                Toast.makeText(MainActivity.this, "Ingrese su numero de celular con el 0 y sin el 15.", Toast.LENGTH_SHORT).show();
-            } else {
-                editTexCelular.setFocusable(false);
-                editTexCelular.setClickable(false);
-                editTextStatus.setEnabled(false);
-                editTextCar.setFocusable(false);
-                editTextCar.setClickable(false);
-                editTextCar.setEnabled(false);
-                editTexCelular.setText(prefs.getString("celular", telefono));
-                editTextCar.setText(prefs.getString("car", prefijo));
-                telefono = editTexCelular.getText().toString();
-                prefijo = editTextCar.getText().toString();
-            }
-
-
-            editTextStatus.setText(imei);
-
-
-        } catch (Exception ex) {
-            Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
-            Log.e("error Forma", ex.toString());
-            finish();
-        }
+        initialConfiguration();
 
         //fecha y hora en pantalla
         editTextFecha = (EditText) findViewById(R.id.editTextFecha);
@@ -176,97 +147,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             editTextHora.setText(hora + ":" + minuto);
         }
 
+        setBotonesEnvio();
 
-        //Envio de pedido de viaje
-        Enviar = (Button) findViewById(R.id.buttonEnviar);
-        Enviar.setText("Solicitar Movil");
-        Enviar.setEnabled(true);
-        Enviar.setOnClickListener(new View.OnClickListener() {
+        vButtonDatos = (Button) findViewById(R.id.buttonDatos);
+        vButtonDatos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //guardo numero de celular
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("celular", editTexCelular.getText().toString());
-                editor.putString("car", editTextCar.getText().toString());
-                editor.commit();
-
-                //envio de login
-                try {
-                    mensaje = editTextMens.getText().toString();
-                    Enviar.setText("GRABANDO PEDIDO");
-                    Enviar.setBackgroundColor(Color.parseColor("#0020c2"));
-                    Enviar.setTextColor(Color.parseColor("#ffffff"));
-                    if (pedidoEnviado) {
-                        Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (mensaje.equals("")) {
-                            Toast.makeText(MainActivity.this, "Indique el origen del viaje.", Toast.LENGTH_SHORT).show();
-                            Enviar.setText("Indique el origen!!!");
-                        } else {
-                            if (editTexCelular.getText().toString().equals("")) {
-                                Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                if (telefono.equals("")) {
-                                    telefono = editTexCelular.getText().toString();
-                                    prefijo = editTextCar.getText().toString();
-                                }
-                                String telCompleto = prefijo + telefono;
-                                //new asynclogin().execute(imei, telCompleto, coordenadas, mensaje); //"02901414900", "1916"
-                                asLogin(imei, telCompleto, coordenadas, mensaje);
-                            }
-                        }
-                    }
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
-                }
+                Intent intent = new
+                        Intent(MainActivity.this, DatosActivity.class);
+                startActivity(intent);
             }
         });
 
-
-        //Envio de consulta de viajes
-        Viajes = (Button) findViewById(R.id.buttonMisViajes);
-        Viajes.setOnClickListener(new View.OnClickListener() {
+        //Envio de consulta de mensajes
+        buttonMensajes = (Button) findViewById(R.id.buttonMensajes);
+        buttonMensajes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //envio de login
-                try {
-                    if (telefono.equals("")) {
-                        telefono = editTexCelular.getText().toString();
-                        prefijo = editTextCar.getText().toString();
-                    }
-                    String telCompleto = prefijo + telefono;
-                    //new asyncViajes().execute(imei, telCompleto);
-                    asViajes(imei, telCompleto);
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
-                }
+                //manejar los mensajes al usuario con este boton
+                Intent intent = new
+                        Intent(MainActivity.this, NovedadesActivity.class);
+                startActivity(intent);
             }
         });
-
-        //Envio de consulta de sugerencia
-        Reclamos = (Button) findViewById(R.id.buttonReclamos);
-        Reclamos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //envio de reclamos
-                try {
-                    if (telefono.equals("")) {
-                        telefono =
-                                editTexCelular.getText().toString();
-                        prefijo = editTextCar.getText().toString();
-                    }
-                    String telCompleto = prefijo + telefono;
-                    Intent intent = new
-                            Intent(MainActivity.this, ReclamosActivity.class);
-                    startActivity(intent);
-                    //asReclamos(imei, telCompleto);
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
 
         if (!isOnline()) {
             Toast.makeText(MainActivity.this, "No hay conexion de datos. Verifique su conexion.", Toast.LENGTH_SHORT).show();
@@ -290,66 +193,266 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         }).start();
+
+        yourWebClient = new WebViewClient() {
+            // you tell the webclient you want to catch when a url is about to load
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                //mWebView.loadUrl(url);
+                return true;
+            }
+
+            // here you execute an action when the URL you want is about to load
+            @Override
+            public void onLoadResource(WebView view, String url) {
+
+            }
+        };
+    }
+
+    private void setBotonesEnvio() {
+        //Envio de pedido de viaje
+        vHomeButton = (RelativeLayout) findViewById(R.id.buttonHome);
+        vWorkButton = (RelativeLayout) findViewById(R.id.buttonWork);
+        vOtrosButton = (RelativeLayout) findViewById(R.id.buttonOtro);
+
+        vHomeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarPedidoConPreseleccion(HOME);
+            }
+        });
+        vWorkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarPedidoConPreseleccion(WORK);
+            }
+        });
+        vOtrosButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarPedidoConPreseleccion(OTHER);
+            }
+        });
+
+        Enviar = (Button) findViewById(R.id.buttonEnviar);
+        Enviar.setText("Solicitar Movil");
+        Enviar.setEnabled(true);
+        Enviar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //envio de login
+                try {
+                    mensaje = editTextMens.getText().toString();
+                    Enviar.setText("GRABANDO PEDIDO");
+                    Enviar.setBackgroundColor(Color.parseColor("#0020c2"));
+                    Enviar.setTextColor(Color.parseColor("#ffffff"));
+                    if (pedidoEnviado) {
+                        Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (mensaje.equals("")) {
+                            Toast.makeText(MainActivity.this, "Indique el origen del viaje.", Toast.LENGTH_SHORT).show();
+                            Enviar.setText("Indique el origen!!!");
+                        } else {
+                            if (editTexCelular.getText().toString().equals("")) {
+                                Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
+                            } else {
+
+                                String telCompleto = prefijo + telefono;
+                                ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje);
+                            }
+                        }
+                    }
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void enviarPedidoConPreseleccion(String origen){
+        if (pedidoEnviado) {
+            Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
+            String telCompleto = prefijo + telefono;
+            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen);
+        }
+    }
+
+    private void initialConfiguration() {
+        try {
+            // identificador del equipo segun tipo
+            Configuration config = getResources().getConfiguration();
+            if (config.smallestScreenWidthDp >= 600) {
+                imei = getMacAdd();
+                sharedPrefs.saveString("imei", "");
+                Log.v("start", "entro por tab");
+            } else {
+
+                //Si hay conexion de WIFI pongo el flag a 1.
+                if (isWifiOnline().equals("wifi")) {
+                    estadoWifi = "1";
+                }
+
+                telefono = getPhoneNumber();
+                //obtengo imei
+                imei = getPhoneImei();//"359781041848146"
+                sharedPrefs.saveString("imei", "");
+            }
+            //obtengo numero del celular
+            editTexCelular = (EditText) findViewById(R.id.editTextCelular);
+            editTextCar = (EditText) findViewById(R.id.editTextCar);
+
+            if (telefono.equals("") && sharedPrefs.getString("celular", "").equals("")) {
+                editTexCelular.setFocusable(true);
+                editTexCelular.setClickable(true);
+                editTexCelular.setEnabled(true);
+                editTextCar.setFocusable(true);
+                editTextCar.setClickable(true);
+                editTextCar.setEnabled(true);
+                Toast.makeText(MainActivity.this, "Ingrese su numero de celular con el 0 y sin el 15.", Toast.LENGTH_SHORT).show();
+            } else {
+                editTexCelular.setFocusable(false);
+                editTexCelular.setClickable(false);
+                editTextStatus.setEnabled(false);
+                editTextCar.setFocusable(false);
+                editTextCar.setClickable(false);
+                editTextCar.setEnabled(false);
+                editTexCelular.setText(sharedPrefs.getString("celular", telefono));
+                editTextCar.setText(sharedPrefs.getString("car", prefijo));
+                telefono = editTexCelular.getText().toString();
+                prefijo = editTextCar.getText().toString();
+            }
+
+
+            editTextStatus.setText(imei);
+
+
+        } catch (Exception ex) {
+            Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
+            Log.e("error Forma", ex.toString());
+            finish();
+        }
+    }
+
+    private void irAReclamos(){
+        try {
+            if (telefono.equals("")) {
+                telefono =
+                        editTexCelular.getText().toString();
+                prefijo = editTextCar.getText().toString();
+            }
+            String telCompleto = prefijo + telefono;
+            Intent intent = new
+                    Intent(MainActivity.this, ReclamosActivity.class);
+            startActivity(intent);
+            //asReclamos(imei, telCompleto);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setupWebView(){
+        WebSettings webSettings = vViajesView.getSettings();
+        webSettings.setJavaScriptEnabled(true); // Enable Javascript.
+        vViajesView.setWebViewClient(yourWebClient);
+
+        webSettings.setAllowFileAccessFromFileURLs(true);
+
+        vViajesView.loadUrl(ServiceUtils.url_viajes);
+    }
+
+
+
+    private void checkPermissions() {
+        try {
+            if (ActivityCompat.checkSelfPermission(this, mPermission[0])
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[1])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[2])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[3])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[4])
+                            != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        mPermission, MY_PERMISSIONS_REQUEST);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                && grantResults[3] == PackageManager.PERMISSION_GRANTED
+                && grantResults[4] == PackageManager.PERMISSION_GRANTED) {
+
+            // permission was granted.
+
+
+        } else {
+
+            // permission denied.
+            Toast.makeText(mContext, "Faltan permisos necesarios para funcionar.", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
     }
 
     private Runnable mMyRunnable = new Runnable() {
         @Override
         public void run() {
 
-            try {
-
-                Ion.with(MainActivity.this)
-                        .load("http://carlitosbahia.dynns.com/movil/Mmensajes.php")
-                        .setBodyParameter("IMEI", imei)
-                        .setBodyParameter("Ubicacion", "")
-                        .setBodyParameter("geopos", "")
-                        .asJsonObject()
-                        .setCallback(new FutureCallback<JsonObject>() {
-                            @Override
-                            public void onCompleted(Exception e, JsonObject result) {
-                                Log.e("Remiscar ", "Main MMENS - " + result);
-                                try {
-                                    int success = result.get("result").getAsInt();
-                                    if (success == 0) {
-                                        Log.e("Remiscar ", "sin mensajes.");
-                                        flg_mens = 0;
-                                        Viajes.setText("Ver Mis Viajes");
-                                        Viajes.setBackgroundColor(Color.parseColor("#4863a0"));
-                                        Viajes.setTextColor(Color.parseColor("#d5d9ea"));
-                                    } else if (success == 1) {
-                                        Log.e("Remiscar ", "Hay mensajes.");
-                                        pedidoEnviado = false;
-                                        if (flg_mens == 0) {
-                                            Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
-                                            final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.c2answer);
-                                            mp.start();
-                                            Viajes.setText("Nuevo mensaje");
-                                            Viajes.setBackgroundColor(Color.parseColor("#ff0000"));
-                                            Viajes.setTextColor(Color.parseColor("#ffffff"));
-                                            flg_mens = 1;
-                                        } else {
-
-                                        }
-                                    }
-
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
-                                }
-
-                            }
-                        });
-
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            ServiceUtils.getMensajes(mContext);
 
         }
     };
 
+    @Subscribe()
+    public void processMensajes(MensajesEvent data) {
+        try {
+            JsonObject result = data.getObject();
+            int success = result.get("result").getAsInt();
+            if (success == 0) {
+                Log.e("Remiscar ", "sin mensajes.");
+                flg_mens = 0;
+                buttonMensajes.setText("Ver Mis Mensajes");
+                buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
+                buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
+            } else if (success == 1) {
+                Log.e("Remiscar ", "Hay mensajes.");
+                pedidoEnviado = false;
+                if (flg_mens == 0) {
+                    Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
+                    final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.c2answer);
+                    mp.start();
+                    buttonMensajes.setText("Nuevo mensaje");
+                    buttonMensajes.setBackgroundColor(Color.parseColor("#ff0000"));
+                    buttonMensajes.setTextColor(Color.parseColor("#ffffff"));
+                    flg_mens = 1;
+                } else {
+
+                }
+            }
+
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
 
     public String getMacAdd() {
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         String macAddress = wInfo.getMacAddress();
         return macAddress;
@@ -381,6 +484,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if(id == R.id.action_reclamos){
+            irAReclamos();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -389,6 +494,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String getPhoneNumber() {
         TelephonyManager mTelephonyManager;
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        assert mTelephonyManager != null;
         return mTelephonyManager.getLine1Number();
     }
 
@@ -396,6 +505,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String getPhoneImei() {
         TelephonyManager mTelephonyManager;
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+        }
         return mTelephonyManager.getDeviceId();
     }
 
@@ -406,39 +518,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String str = location.getLatitude() + "," + location.getLongitude();
         lat = (Double) location.getLatitude();
         lon = (Double) location.getLongitude();
-        //Toast.makeText(getBaseContext(), str, Toast.LENGTH_LONG).show();
-
-        /*if(estadoWifi.equals("1") && !MainActivity.this.isFinishing()){
-            // en coordenadas va el dato a enviar.
-            // Si hay wifi se envia direccion, sino las coordenadas
-            getMyLocationAddress();
-            coordenadas = direccion;
-        }else{
-            coordenadas = str;
-        }*/
         coordenadas = str;
         editTexUbicacion.setText("Ubicacion detectada.");
-        //editTexUbicacion.setText(direccion);
+
     }
 
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-        /******** Called when User off Gps *********/
-        Toast.makeText(getBaseContext(), "Gps turned off ", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-        /******** Called when User on Gps  *********/
-        Toast.makeText(getBaseContext(), "Gps turned on ", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
+    private void getSingleLocation() {
+        Location singleLocation = locationHelper.getLastLocation();
+        lat = (Double) singleLocation.getLatitude();
+        lon = (Double) singleLocation.getLongitude();
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -514,89 +602,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    @Subscribe()
+    public void processReservas(ReservasEvent data) {
 
-    //INICIO - Tarea asincrona para envio del pedido a origenreservas.php
-    private void asLogin(String imei, String celu, String geo, String obs) {
-        Ion.with(MainActivity.this)
-                .load("http://carlitosbahia.dynns.com/movil/origenreservas.php")
-                .setBodyParameter("submit", "submit")
-                .setBodyParameter("IMEI", imei)
-                .setBodyParameter("Celular", celu)
-                .setBodyParameter("Geoposicion", geo)
-                .setBodyParameter("Observaciones", obs)
-                .asString(Charset.forName("iso-8859-1"))
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar ", "Login  - " + result);
-                        try {
-                            if (result.equals("ok")) {
-                                Toast.makeText(getBaseContext(), "Pedido enviado.", Toast.LENGTH_LONG).show();
-                                pedidoEnviado = true;
-                                Enviar.setEnabled(false);
-                                Enviar.setText("Enviando");
-                            } else {
-                                final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                                SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString("webresult", result);
-                                editor.commit();
+        try {
+            if (data.getDataString().equals("ok")) {
+                Toast.makeText(getBaseContext(), "Pedido enviado.", Toast.LENGTH_LONG).show();
+                pedidoEnviado = true;
+                Enviar.setEnabled(false);
+                Enviar.setText("Enviando");
+            } else {
+                sharedPrefs.saveString("webresult", data.getDataString());
 
-                                Intent intent = new Intent(MainActivity.this, WebActivity.class);
-                                startActivity(intent);
-                            }
+                Intent intent = new Intent(MainActivity.this, WebActivity.class);
+                startActivity(intent);
+            }
 
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
 
-                    }
-                });
     }
-
-
-//FIN - Tarea asincrona para envio del pedido a origenreservas.php
-
-    //INICIO - Tarea asincrona consulta de mis viajes a origen.php
-    private void asViajes(String imei, String celu) {
-        Ion.with(MainActivity.this)
-                .load("http://carlitosbahia.dynns.com/movil/origen.php")
-                .setBodyParameter("IMEI", imei)
-                .setBodyParameter("Celular", celu)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar ", "Login  - " + result);
-                        try {
-                            if (result.equals("ok")) {
-
-                            } else {
-
-                                final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                                SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString("webresult", result);
-                                editor.commit();
-
-                                Intent intent = new Intent(MainActivity.this, WebActivity.class);
-                                startActivity(intent);
-                            }
-
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-
-                    }
-                });
-    }
-
-
-//FIN - Tarea asincrona consulta de mis viajes a origen.php
-
-    //INICIO - Tarea asincrona consulta de mis viajes a reclamos.php
-
-
-//FIN - Tarea asincrona consulta de mis viajes a reclamos.php
-
 
     @Override
     public void onBackPressed() {
@@ -608,6 +634,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
+        locationHelper.onPause();
         mHandler.removeCallbacks(mMyRunnable);
     }
 
@@ -615,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
+        locationHelper.onResume(MainActivity.this);
     }
 
 }

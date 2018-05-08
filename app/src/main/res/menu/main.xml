@@ -7,6 +7,10 @@
         android:title="Contacto"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_reclamos"
+        android:title="Reclamos"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
     <item android:title="Version 2.2"
         android:orderInCategory="100"
         app:showAsAction="never" />

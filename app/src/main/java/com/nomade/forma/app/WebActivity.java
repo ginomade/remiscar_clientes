@@ -24,6 +24,13 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.nomade.forma.app.events.MensajesEvent;
+import com.nomade.forma.app.events.ReservasEvent;
+import com.nomade.forma.app.events.ViajesEvent;
+import com.nomade.forma.app.utils.ServiceUtils;
+import com.nomade.forma.app.utils.SharedPrefsUtil;
+
+import org.greenrobot.eventbus.Subscribe;
 
 
 public class WebActivity extends AppCompatActivity {
@@ -42,7 +49,8 @@ public class WebActivity extends AppCompatActivity {
     String telCompleto;
     Handler myHandler;
     int flg_mens = 0; // flag para mensajes
-    //Button buttonMisViajes;
+    Context mContext;
+    SharedPrefsUtil sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,18 +60,14 @@ public class WebActivity extends AppCompatActivity {
         boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
         // identificador del equipo segun tipo
         Configuration config = getResources().getConfiguration();
-        if (config.smallestScreenWidthDp >= 600) {
-            imei = getMacAdd();
-        } else {
-            //obtengo imei
-            imei = getPhoneImei();//"359781041848146"
-        }
+        imei = sharedPrefs.getString("imei", "");
 
+        mContext = WebActivity.this;
+        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
 
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WebActivity.this);
-        webcontent = prefs.getString("webresult", "Error.");
-        telefono = prefs.getString("celular", "");
-        prefijo = prefs.getString("car", "");
+        webcontent = sharedPrefs.getString("webresult", "Error.");
+        telefono = sharedPrefs.getString("celular", "");
+        prefijo = sharedPrefs.getString("car", "");
         telCompleto = prefijo + telefono;
 
         webView = (WebView) findViewById(R.id.webView);
@@ -125,30 +129,6 @@ public class WebActivity extends AppCompatActivity {
 
     }
 
-    public String isTablet() {
-        TelephonyManager manager = (TelephonyManager) WebActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
-            return "Tablet";
-        } else {
-            return "Mobile";
-        }
-    }
-
-    public String getMacAdd() {
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wInfo = wifiManager.getConnectionInfo();
-        String macAddress = wInfo.getMacAddress();
-        return macAddress;
-    }
-
-    //Obtener numero de imei
-    private String getPhoneImei() {
-        TelephonyManager mTelephonyManager;
-        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        return mTelephonyManager.getDeviceId();
-    }
-
-
     //Here's a runnable/handler combo
     private Runnable mMyRunnable = new Runnable() {
         @Override
@@ -164,50 +144,8 @@ public class WebActivity extends AppCompatActivity {
             } else {
 
                 //nuevo mensaje
-                Ion.with(WebActivity.this)
-                        .load("http://carlitosbahia.dynns.com/movil/Mmensajes.php")
-                        .setBodyParameter("IMEI", imei)
-                        .setBodyParameter("Ubicacion", "")
-                        .setBodyParameter("geopos", "")
-                        .asJsonObject()
-                        .setCallback(new FutureCallback<JsonObject>() {
-                            @Override
-                            public void onCompleted(Exception e, JsonObject result) {
-                                Log.e("Remiscar ", "MMENS - " + result);
-                                try {
-                                    int success = result.get("result").getAsInt();
-                                    if (success == 0) {
-                                        Log.e("Remiscar ", "sin mensajes.");
-                                        //    flg_mens=0;
-                                        Ret.setText("Inicio");
-                                        Ret.setBackgroundColor(Color.parseColor("#4863a0"));
-                                        Ret.setTextColor(Color.parseColor("#d5d9ea"));
-                                    } else if (success == 1) {
-                                        Log.e("Remiscar ", "hay mensajes.");
-                                        //   if(flg_mens==0){
-                                        Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
-                                        final MediaPlayer mp = MediaPlayer.create(WebActivity.this, R.raw.c2answer);
-                                        mp.start();
-                                        Ret.setText("Nuevo mensaje");
-                                        Ret.setBackgroundColor(Color.parseColor("#ff0000"));
-                                        Ret.setTextColor(Color.WHITE);
-                                        //   }else{
-
-                                        //   }
-                                        //Thread.sleep(3000);
-                                        //myHandler.post(mMyRunnable);
-                                        //cargarOrigen();
-
-                                    }
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
-                                }
-
-                            }
-                        });
-                //new asyncOper().execute(imei,"origen.php",telCompleto);
-                cargarOrigen();
-
+                ServiceUtils.getMensajes(mContext);
+                ServiceUtils.getViajes(mContext, imei, telCompleto);
             }
             if (flgCiclo == 0) {
                 flgCiclo = 1;
@@ -218,32 +156,45 @@ public class WebActivity extends AppCompatActivity {
         }
     };
 
-
-    // tarea asincrona de carga de origen.php
-    public void cargarOrigen() {
+    @Subscribe()
+    public void processMensajes(MensajesEvent data) {
         try {
-            Ion.with(WebActivity.this)
-                    .load("http://carlitosbahia.dynns.com/movil/origen.php")
-                    .setBodyParameter("IMEI", imei)
-                    .setBodyParameter("Celular", telCompleto)
-                    .setBodyParameter("geopos", "")
-                    .asString()
-                    .setCallback(new FutureCallback<String>() {
-                        @Override
-                        public void onCompleted(Exception e, String result) {
-                            Log.e("Remiscar ", "ORIGEN - " + result);
-                            try {
-                                webView.loadData(result, "text/html; charset=UTF-8", null);
-                                webcontent = result;
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
+            JsonObject result = data.getObject();
+            int success = result.get("result").getAsInt();
+            if (success == 0) {
+                Log.e("Remiscar ", "sin mensajes.");
+                //    flg_mens=0;
+                Ret.setText("Inicio");
+                Ret.setBackgroundColor(Color.parseColor("#4863a0"));
+                Ret.setTextColor(Color.parseColor("#d5d9ea"));
+            } else if (success == 1) {
+                Log.e("Remiscar ", "hay mensajes.");
+                //   if(flg_mens==0){
+                Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
+                final MediaPlayer mp = MediaPlayer.create(WebActivity.this, R.raw.c2answer);
+                mp.start();
+                Ret.setText("Nuevo mensaje");
+                Ret.setBackgroundColor(Color.parseColor("#ff0000"));
+                Ret.setTextColor(Color.WHITE);
 
-                        }
-                    });
-        } catch (Exception e) {
-            Log.e("Remiscar ", "Web Origen ERR - " + e);
+            }
+
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
+    }
+
+    @Subscribe()
+    public void processViajes(ViajesEvent data) {
+
+        try {
+            webView.loadData(data.getDataString(), "text/html; charset=UTF-8", null);
+            webcontent = data.getDataString();
+
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     @Override

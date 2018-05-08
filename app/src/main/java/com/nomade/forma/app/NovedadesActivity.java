@@ -1,5 +1,6 @@
 package com.nomade.forma.app;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 
+import com.nomade.forma.app.utils.SharedPrefsUtil;
+
 // pantalla de datos de novedades para el movil
 public class NovedadesActivity extends AppCompatActivity {
 
@@ -19,14 +22,17 @@ public class NovedadesActivity extends AppCompatActivity {
 
     public Button Ret;
     String params;
+    Context mContext;
+    SharedPrefsUtil sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_novedades);
 
-        SharedPreferences settings = getSharedPreferences("RemisData", 0);
-        String imei = settings.getString("imei", "");
+        mContext = NovedadesActivity.this;
+        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
+        String imei = sharedPrefs.getString("imei", "");
 
         params = "?IMEI=" + imei;
 
