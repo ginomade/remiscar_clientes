@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     RelativeLayout vWorkButton;
     RelativeLayout vOtrosButton;
 
+    String tNombre, tApellido, tDireccionCasa,
+            tDireccionTrabajo, tDireccionAlt, tUsuario;
+
     Button vButtonDatos;
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
@@ -125,10 +128,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
 
-
         boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
 
         initialConfiguration();
+        initDatosUsuario();
 
         //fecha y hora en pantalla
         editTextFecha = (EditText) findViewById(R.id.editTextFecha);
@@ -210,11 +213,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         };
     }
 
+    private void initDatosUsuario() {
+        tNombre = sharedPrefs.getString("nombre", "");
+        tApellido = sharedPrefs.getString("apellido", "");
+        tDireccionCasa = sharedPrefs.getString("direccion_casa", "");
+        tDireccionTrabajo = sharedPrefs.getString("direccion_trabajo", "");
+        tDireccionAlt = sharedPrefs.getString("direccion_alt", "");
+        tUsuario = tNombre + " " + tApellido;
+    }
+
     private void setBotonesEnvio() {
         //Envio de pedido de viaje
         vHomeButton = (RelativeLayout) findViewById(R.id.buttonHome);
         vWorkButton = (RelativeLayout) findViewById(R.id.buttonWork);
         vOtrosButton = (RelativeLayout) findViewById(R.id.buttonOtro);
+
+        if(tDireccionCasa.equals("")){
+            vHomeButton.setEnabled(false);
+        }
 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -260,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             } else {
 
                                 String telCompleto = prefijo + telefono;
-                                ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje);
+                                ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje, tUsuario);
                             }
                         }
                     }
@@ -271,13 +287,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-    private void enviarPedidoConPreseleccion(String origen){
+    private void enviarPedidoConPreseleccion(String origen) {
         if (pedidoEnviado) {
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
             String telCompleto = prefijo + telefono;
-            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen);
+            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario);
         }
     }
 
@@ -337,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void irAReclamos(){
+    private void irAReclamos() {
         try {
             if (telefono.equals("")) {
                 telefono =
@@ -354,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void setupWebView(){
+    private void setupWebView() {
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
         vViajesView.setWebViewClient(yourWebClient);
@@ -363,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         vViajesView.loadUrl(ServiceUtils.url_viajes);
     }
-
 
 
     private void checkPermissions() {
@@ -484,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-        } else if(id == R.id.action_reclamos){
+        } else if (id == R.id.action_reclamos) {
             irAReclamos();
         }
         return super.onOptionsItemSelected(item);

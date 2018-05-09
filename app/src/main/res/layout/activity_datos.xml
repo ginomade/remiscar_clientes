@@ -8,68 +8,110 @@
 
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/editName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="11dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="13dp"
         android:ems="10"
         android:hint="Nombre"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="49dp" />
+        app:layout_constraintBottom_toTopOf="@+id/editApellido"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/editApellido"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Apellido"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="105dp" />
+        app:layout_constraintBottom_toTopOf="@+id/editDomCasa"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editName" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/editDomCasa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
         android:ems="10"
-        android:hint="Domicilio"
+        android:hint="Domicilio Casa"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="162dp" />
+        app:layout_constraintBottom_toTopOf="@+id/editDomTrabajo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editApellido" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/editDomTrabajo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Domicilio trabajo"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="220dp" />
+        app:layout_constraintBottom_toTopOf="@+id/editDomAlt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDomCasa" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/editDomAlt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="121dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Domicilio alternativo"
         android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="276dp" />
+        app:layout_constraintBottom_toTopOf="@+id/buttonSend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDomTrabajo" />
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:layout_marginEnd="171dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="Complete sus datos personales"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintBottom_toTopOf="@+id/editName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/buttonSend"
         android:layout_width="354dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="11dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
         android:text="Guardar"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="445dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDomAlt" />
 </android.support.constraint.ConstraintLayout>
