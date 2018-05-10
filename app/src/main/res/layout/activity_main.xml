@@ -42,7 +42,7 @@
                     android:id="@+id/buttonHome"
                     android:layout_weight="1"
                     android:layout_margin="5dp"
-                    android:background="#0288D1">
+                    android:background="@drawable/selector_button_background">
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="match_parent"
@@ -56,7 +56,7 @@
                     android:id="@+id/buttonWork"
                     android:layout_weight="1"
                     android:layout_margin="5dp"
-                    android:background="#0288D1">
+                    android:background="@drawable/selector_button_background">
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="match_parent"
@@ -70,7 +70,7 @@
                     android:id="@+id/buttonOtro"
                     android:layout_weight="1"
                     android:layout_margin="5dp"
-                    android:background="#0288D1">
+                    android:background="@drawable/selector_button_background">
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="match_parent"

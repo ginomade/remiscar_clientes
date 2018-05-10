@@ -56,12 +56,6 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     public EditText editTextMens;
-    public EditText editTextStatus;
-    public EditText editTextFecha;
-    public EditText editTextHora;
-    public EditText editTexCelular;
-    public EditText editTextCar;
-    public EditText editTexUbicacion;
     public String telefono = "";
     public String prefijo = "";
     public String imei;
@@ -76,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public TextView textStatus;
     public String estadoWifi = "0";
     public String coordenadas;
+    String telCompleto = "";
     Handler mHandler;
     int flg_mens = 0; // flag para mensajes
 
@@ -112,9 +107,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        editTextStatus = (EditText) findViewById(R.id.editTextStatus);
-        editTexUbicacion = (EditText) findViewById(R.id.editTextUbicacion);
-        textStatus = (TextView) findViewById(R.id.textStatus);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         setupWebView();
         mHandler = new android.os.Handler();
@@ -134,21 +126,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         initDatosUsuario();
 
         //fecha y hora en pantalla
-        editTextFecha = (EditText) findViewById(R.id.editTextFecha);
-        editTextHora = (EditText) findViewById(R.id.editTextHora);
+
         editTextMens = (EditText) findViewById(R.id.editTextMens);
-        Calendar c = Calendar.getInstance();
-        int hora = c.get(Calendar.HOUR_OF_DAY);
-        int minuto = c.get(Calendar.MINUTE);
-        int dia = c.get(Calendar.DATE);
-        int mes = c.get(Calendar.MONTH) + 1;
-        int anio = c.get(Calendar.YEAR);
-        editTextFecha.setText(dia + "/" + mes + "/" + anio);
-        if (minuto < 10) {
-            editTextHora.setText(hora + ":0" + minuto);
-        } else {
-            editTextHora.setText(hora + ":" + minuto);
-        }
 
         setBotonesEnvio();
 
@@ -176,9 +155,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         if (!isOnline()) {
             Toast.makeText(MainActivity.this, "No hay conexion de datos. Verifique su conexion.", Toast.LENGTH_SHORT).show();
-            textStatus.setText("Sin Conexión.");
+
         } else {
-            textStatus.setText("Online.");
+
         }
 
 
@@ -219,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tDireccionCasa = sharedPrefs.getString("direccion_casa", "");
         tDireccionTrabajo = sharedPrefs.getString("direccion_trabajo", "");
         tDireccionAlt = sharedPrefs.getString("direccion_alt", "");
+        telCompleto = sharedPrefs.getString("telefono", "");
         tUsuario = tNombre + " " + tApellido;
     }
 
@@ -228,9 +208,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vWorkButton = (RelativeLayout) findViewById(R.id.buttonWork);
         vOtrosButton = (RelativeLayout) findViewById(R.id.buttonOtro);
 
-        if(tDireccionCasa.equals("")){
-            vHomeButton.setEnabled(false);
-        }
+        vHomeButton.setEnabled(!tDireccionCasa.equals(""));
+        vWorkButton.setEnabled(!tDireccionTrabajo.equals(""));
+        vOtrosButton.setEnabled(!tDireccionAlt.equals(""));
 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,12 +251,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             Toast.makeText(MainActivity.this, "Indique el origen del viaje.", Toast.LENGTH_SHORT).show();
                             Enviar.setText("Indique el origen!!!");
                         } else {
-                            if (editTexCelular.getText().toString().equals("")) {
+
+                            if (telCompleto.toString().equals("")) {
                                 Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
                             } else {
 
-                                String telCompleto = prefijo + telefono;
                                 ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje, tUsuario);
+
                             }
                         }
                     }
@@ -317,34 +298,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 imei = getPhoneImei();//"359781041848146"
                 sharedPrefs.saveString("imei", "");
             }
-            //obtengo numero del celular
-            editTexCelular = (EditText) findViewById(R.id.editTextCelular);
-            editTextCar = (EditText) findViewById(R.id.editTextCar);
-
-            if (telefono.equals("") && sharedPrefs.getString("celular", "").equals("")) {
-                editTexCelular.setFocusable(true);
-                editTexCelular.setClickable(true);
-                editTexCelular.setEnabled(true);
-                editTextCar.setFocusable(true);
-                editTextCar.setClickable(true);
-                editTextCar.setEnabled(true);
-                Toast.makeText(MainActivity.this, "Ingrese su numero de celular con el 0 y sin el 15.", Toast.LENGTH_SHORT).show();
-            } else {
-                editTexCelular.setFocusable(false);
-                editTexCelular.setClickable(false);
-                editTextStatus.setEnabled(false);
-                editTextCar.setFocusable(false);
-                editTextCar.setClickable(false);
-                editTextCar.setEnabled(false);
-                editTexCelular.setText(sharedPrefs.getString("celular", telefono));
-                editTextCar.setText(sharedPrefs.getString("car", prefijo));
-                telefono = editTexCelular.getText().toString();
-                prefijo = editTextCar.getText().toString();
-            }
-
-
-            editTextStatus.setText(imei);
-
 
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
@@ -355,11 +308,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void irAReclamos() {
         try {
-            if (telefono.equals("")) {
-                telefono =
-                        editTexCelular.getText().toString();
-                prefijo = editTextCar.getText().toString();
-            }
             String telCompleto = prefijo + telefono;
             Intent intent = new
                     Intent(MainActivity.this, ReclamosActivity.class);
@@ -534,7 +482,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         lat = (Double) location.getLatitude();
         lon = (Double) location.getLongitude();
         coordenadas = str;
-        editTexUbicacion.setText("Ubicacion detectada.");
 
     }
 

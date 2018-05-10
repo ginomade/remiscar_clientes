@@ -14,7 +14,7 @@ import com.nomade.forma.app.utils.SharedPrefsUtil;
 public class DatosActivity extends AppCompatActivity {
 
     EditText tNombre, tApellido, tDireccionCasa,
-    tDireccionTrabajo, tDireccionAlt;
+    tDireccionTrabajo, tDireccionAlt, tTelefono;
     Button bSend;
 
     Context mContext;
@@ -37,14 +37,16 @@ public class DatosActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(tNombre.getText().toString().equals("")
-                        || tApellido.getText().toString().equals("")){
-                    Toast.makeText(mContext, "Falta Nombre o Apellido", Toast.LENGTH_LONG).show();
+                        || tApellido.getText().toString().equals("")
+                        || tTelefono.getText().toString().equals("")){
+                    Toast.makeText(mContext, "Falta Nombre, Apellido o Telefono", Toast.LENGTH_LONG).show();
                 }else{
                     sharedPrefs.saveString("nombre", tNombre.getText().toString());
                     sharedPrefs.saveString("apellido", tApellido.getText().toString());
                     sharedPrefs.saveString("direccion_casa", tDireccionCasa.getText().toString());
                     sharedPrefs.saveString("direccion_trabajo", tDireccionTrabajo.getText().toString());
                     sharedPrefs.saveString("direccion_alt", tDireccionAlt.getText().toString());
+                    sharedPrefs.saveString("telefono", tTelefono.getText().toString());
                     Toast.makeText(mContext, "Datos Guardados.", Toast.LENGTH_LONG).show();
                 }
             }
@@ -57,6 +59,7 @@ public class DatosActivity extends AppCompatActivity {
         tDireccionCasa.setText(sharedPrefs.getString("direccion_casa", ""));
         tDireccionTrabajo.setText(sharedPrefs.getString("direccion_trabajo", ""));
         tDireccionAlt.setText(sharedPrefs.getString("direccion_alt", ""));
+        tTelefono.setText(sharedPrefs.getString("telefono", ""));
     }
 
     private void initViewElements() {
@@ -65,6 +68,7 @@ public class DatosActivity extends AppCompatActivity {
         tDireccionCasa = (EditText) findViewById(R.id.editDomCasa);
         tDireccionTrabajo = (EditText) findViewById(R.id.editDomTrabajo);
         tDireccionAlt = (EditText) findViewById(R.id.editDomAlt);
+        tTelefono = (EditText) findViewById(R.id.editTelefono);
         bSend = (Button) findViewById(R.id.buttonSend);
 
     }

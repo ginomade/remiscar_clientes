@@ -75,17 +75,34 @@
         android:id="@+id/editDomAlt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="121dp"
+        android:layout_marginBottom="9dp"
         android:layout_marginEnd="153dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Domicilio alternativo"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSend"
+        app:layout_constraintBottom_toTopOf="@+id/editTelefono"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editDomTrabajo" />
+
+    <EditText
+        android:id="@+id/editTelefono"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="21dp"
+        android:layout_marginEnd="153dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:hint="Telefono (sin 0 y sin 15)"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDomAlt" />
 
     <TextView
         android:id="@+id/textView9"
@@ -113,5 +130,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDomAlt" />
+        app:layout_constraintTop_toBottomOf="@+id/editTelefono" />
 </android.support.constraint.ConstraintLayout>
