@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.JsonObject;
+import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
@@ -50,7 +51,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Calendar;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -66,8 +66,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String url;
     static String direccion = "";
     public String mensaje;
-    private ProgressDialog pDialog;
-    public TextView textStatus;
+    public TextView textBloqueado;
     public String estadoWifi = "0";
     public String coordenadas;
     String telCompleto = "";
@@ -125,9 +124,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         initialConfiguration();
         initDatosUsuario();
 
+        //validar celu bloqueado
+        ServiceUtils.validarImei(MainActivity.this);
+
         //fecha y hora en pantalla
 
         editTextMens = (EditText) findViewById(R.id.editTextMens);
+        textBloqueado = (TextView) findViewById(R.id.textBloqueado);
 
         setBotonesEnvio();
 
@@ -166,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             public void run() {
                 while (!MainActivity.this.isFinishing()) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(30000);
 
                         mHandler.post(mMyRunnable);
                     } catch (Exception e) {
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             // you tell the webclient you want to catch when a url is about to load
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                //mWebView.loadUrl(url);
+                view.loadUrl(url);
                 return true;
             }
 
@@ -284,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Configuration config = getResources().getConfiguration();
             if (config.smallestScreenWidthDp >= 600) {
                 imei = getMacAdd();
-                sharedPrefs.saveString("imei", "");
-                Log.v("start", "entro por tab");
+                sharedPrefs.saveString("imei", imei);
+                Log.v("Remiscar", "entro por tab");
             } else {
 
                 //Si hay conexion de WIFI pongo el flag a 1.
@@ -296,7 +299,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 telefono = getPhoneNumber();
                 //obtengo imei
                 imei = getPhoneImei();//"359781041848146"
-                sharedPrefs.saveString("imei", "");
+                sharedPrefs.saveString("imei", imei);
+                Log.i("Remiscar", "start imei "+ imei);
             }
 
         } catch (Exception ex) {
@@ -324,8 +328,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vViajesView.setWebViewClient(yourWebClient);
 
         webSettings.setAllowFileAccessFromFileURLs(true);
-
-        vViajesView.loadUrl(ServiceUtils.url_viajes);
+        String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
+        Log.w("Remiscar", "viajes: "+ finalUrl);
+        vViajesView.loadUrl(finalUrl);
     }
 
 
@@ -565,6 +570,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     @Subscribe()
+    public void processBloqueado(BloqueadoEvent data) {
+
+        try {
+            JsonObject result = data.getObject();
+            int success = result.get("result").getAsInt();
+            if (success == 0) {
+                Log.e("Remiscar ", "celular validado.");
+
+            } else if (success == 1) {
+                Log.e("Remiscar ", "celular bloqueado.");
+                setBloqueado();
+            }
+
+        } catch (Exception ee) {
+
+            Log.d("Remiscar ", "No se puede validar celular.");
+        }
+
+    }
+
+    private void setBloqueado(){
+        textBloqueado.setVisibility(View.VISIBLE);
+        vHomeButton.setEnabled(false);
+        vWorkButton.setEnabled(false);
+        vOtrosButton.setEnabled(false);
+        vViajesView.setVisibility(View.GONE);
+        buttonMensajes.setEnabled(false);
+        Enviar.setEnabled(false);
+        vButtonDatos.setEnabled(false);
+    }
+
+    @Subscribe()
     public void processReservas(ReservasEvent data) {
 
         try {
@@ -605,6 +642,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
         locationHelper.onResume(MainActivity.this);
+        initDatosUsuario();
+        setBotonesEnvio();
     }
 
 }

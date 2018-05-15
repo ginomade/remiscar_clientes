@@ -24,5 +24,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="mensaje_bloqueado">Este número se encuentra bloqueado.  Por favor comuniquese con la agencia.</string>
 
 </resources>

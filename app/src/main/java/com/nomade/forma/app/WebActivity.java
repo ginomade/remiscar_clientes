@@ -60,11 +60,11 @@ public class WebActivity extends AppCompatActivity {
         boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
         // identificador del equipo segun tipo
         Configuration config = getResources().getConfiguration();
-        imei = sharedPrefs.getString("imei", "");
 
         mContext = WebActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
 
+        imei = sharedPrefs.getString("imei", "");
         webcontent = sharedPrefs.getString("webresult", "Error.");
         telefono = sharedPrefs.getString("celular", "");
         prefijo = sharedPrefs.getString("car", "");

@@ -14,6 +14,7 @@ import com.nomade.forma.app.MainActivity;
 import com.nomade.forma.app.R;
 import com.nomade.forma.app.ReclamosActivity;
 import com.nomade.forma.app.WebActivity;
+import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReclamosEvent;
 import com.nomade.forma.app.events.ReservasEvent;
@@ -34,6 +35,7 @@ public class ServiceUtils {
     private static String url_origenreservas = base_url + "origenreservas.php";
     public static String url_viajes = base_url + "origen.php";
     private static String url_reclamosMovil = base_url + "reclamosMovil.php";
+    private static String url_celu_bloqueado = base_url + "Mcelubloqueado.php";
 
     public static void asUbicacion(Context context, String url_ubicacion) {
         Ion.with(context)
@@ -48,6 +50,26 @@ public class ServiceUtils {
                             EventBus.getDefault().post(event);
                         } else {
                             Log.d("Remiscar* ", "error en asLocation.");
+                        }
+
+                    }
+                });
+    }
+
+    public static void validarImei(Context context) {
+        Ion.with(context)
+                .load(url_celu_bloqueado)
+                .setBodyParameter("IMEI", SharedPrefsUtil.getInstance(context).getString("imei", ""))
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (result != null) {
+                            BloqueadoEvent event = new BloqueadoEvent();
+                            event.setObject(result);
+                            EventBus.getDefault().post(event);
+                        } else {
+                            Log.d("Remiscar* ", "error en validar bloqueados.");
                         }
 
                     }
