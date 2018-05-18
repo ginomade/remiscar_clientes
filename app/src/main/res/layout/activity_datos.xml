@@ -43,8 +43,8 @@
         android:id="@+id/editDomCasa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -55,12 +55,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editApellido" />
 
+    <RelativeLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/editDomCasa"
+        app:layout_constraintBottom_toBottomOf="@+id/editDomCasa"
+        android:background="@drawable/selector_button_background">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_home_white_24dp" />
+    </RelativeLayout>
+
     <EditText
         android:id="@+id/editDomTrabajo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -71,12 +87,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editDomCasa" />
 
+    <RelativeLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/editDomTrabajo"
+        app:layout_constraintBottom_toBottomOf="@+id/editDomTrabajo"
+        android:background="@drawable/selector_button_background">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_work_white_24dp" />
+    </RelativeLayout>
+
     <EditText
         android:id="@+id/editDomAlt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -86,6 +118,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editDomTrabajo" />
+
+    <RelativeLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/editDomAlt"
+        app:layout_constraintBottom_toBottomOf="@+id/editDomAlt"
+        android:background="@drawable/selector_button_background">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_youtube_searched_for_white_24dp" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/editTelefono"

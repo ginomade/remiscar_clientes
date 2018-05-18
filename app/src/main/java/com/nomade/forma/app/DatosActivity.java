@@ -48,6 +48,7 @@ public class DatosActivity extends AppCompatActivity {
                     sharedPrefs.saveString("direccion_alt", tDireccionAlt.getText().toString());
                     sharedPrefs.saveString("telefono", tTelefono.getText().toString());
                     Toast.makeText(mContext, "Datos Guardados.", Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
         });

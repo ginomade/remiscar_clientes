@@ -108,6 +108,7 @@ public class ServiceUtils {
     //envio del pedido a origenreservas.php
     public static void sendReservas(Context context, String imei, String celu, String geo,
                                     String obs, String nombreUsuario) {
+        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-" + geo + "-" + obs + "-" + nombreUsuario);
         Ion.with(context)
                 .load(url_origenreservas)
                 .setBodyParameter("submit", "submit")
@@ -134,6 +135,7 @@ public class ServiceUtils {
     }
 
     public static void getViajes(Context context, String imei, String celu) {
+        Log.w("remiscar", "sendReservas - " + imei + "-" + celu);
         Ion.with(context)
                 .load(url_viajes)
                 .setBodyParameter("IMEI", imei)
@@ -170,6 +172,7 @@ public class ServiceUtils {
     }
 
     public static void getReclamos(Context context, String imei, String celu, String mensaje) {
+        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-");
         Ion.with(context)
                 .load(url_reclamosMovil + "?&IMEI=" + imei + "&Celular=" + celu + "&Descripcion=" + mensaje)
                 .asString()

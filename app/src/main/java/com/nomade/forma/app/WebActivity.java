@@ -66,9 +66,7 @@ public class WebActivity extends AppCompatActivity {
 
         imei = sharedPrefs.getString("imei", "");
         webcontent = sharedPrefs.getString("webresult", "Error.");
-        telefono = sharedPrefs.getString("celular", "");
-        prefijo = sharedPrefs.getString("car", "");
-        telCompleto = prefijo + telefono;
+        telCompleto = sharedPrefs.getString("telefono", "");
 
         webView = (WebView) findViewById(R.id.webView);
         webView.setVisibility(View.VISIBLE);

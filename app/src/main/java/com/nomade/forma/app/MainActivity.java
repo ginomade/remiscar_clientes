@@ -215,19 +215,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enviarPedidoConPreseleccion(HOME);
+                enviarPedidoConPreseleccion(tDireccionCasa);
             }
         });
         vWorkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enviarPedidoConPreseleccion(WORK);
+                enviarPedidoConPreseleccion(tDireccionTrabajo);
             }
         });
         vOtrosButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enviarPedidoConPreseleccion(OTHER);
+                enviarPedidoConPreseleccion(tDireccionAlt);
             }
         });
 
@@ -273,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
-            String telCompleto = prefijo + telefono;
             ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario);
         }
     }

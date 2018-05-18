@@ -33,6 +33,7 @@ public class ReclamosActivity extends AppCompatActivity {
     public String telefono;
     public String prefijo;
     public Button Ret, send;
+    String telCompleto = "";
     EditText mensaje;
     private static final String URL = "http://carlitosbahia.dynns.com/movil/reclamosMovil.php";
     String TAG_SUCCESS = "result";
@@ -54,17 +55,14 @@ public class ReclamosActivity extends AppCompatActivity {
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         //imei = settings.getString("imei", "");
         imei = sharedPrefs.getString("imei", "");
-        telefono = sharedPrefs.getString("celular", "");
-        prefijo = sharedPrefs.getString("car", "");
-        Log.e("Remiscar:", "Reclamos  - celu " + telefono);
+        telCompleto = sharedPrefs.getString("telefono", "");
+        Log.e("Remiscar:", "Reclamos  - celu " + telCompleto);
         Log.e("Remiscar:", "Reclamos  - imei " + imei);
-        final String telCompleto = prefijo + telefono;
 
         ll_mensaje = (LinearLayout) findViewById(R.id.mensaje);
         ll_confirmacion = (LinearLayout) findViewById(R.id.confirmacion);
 
         mensaje = (EditText) findViewById(R.id.editReclamo);
-        //mensaje= EditText.getText().toString();
 
         mostrarForm();
 
@@ -74,7 +72,6 @@ public class ReclamosActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-                //asReclamos(imei,  telCompleto, mensaje.getText().toString());
                 try {
                     String texto = URLEncoder.encode(mensaje.getText().toString(), "utf-8");
                     if (texto.equals("")) {
