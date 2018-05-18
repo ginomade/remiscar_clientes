@@ -91,9 +91,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_SMS,
-            Manifest.permission.READ_PHONE_NUMBERS,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            Manifest.permission.ACCESS_FINE_LOCATION};
 
     static final String HOME = "CASA";
     static final String WORK = "TRABAJO";
@@ -150,9 +148,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onClick(View v) {
                 //manejar los mensajes al usuario con este boton
-                Intent intent = new
-                        Intent(MainActivity.this, NovedadesActivity.class);
-                startActivity(intent);
+                vViajesView.reload();
+                resetBotonMensajes();
             }
         });
 
@@ -341,10 +338,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     ActivityCompat.checkSelfPermission(this, mPermission[1])
                             != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, mPermission[2])
-                            != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, mPermission[3])
-                            != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, mPermission[4])
                             != PackageManager.PERMISSION_GRANTED) {
 
                 ActivityCompat.requestPermissions(this,
@@ -362,9 +355,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                && grantResults[2] == PackageManager.PERMISSION_GRANTED
-                && grantResults[3] == PackageManager.PERMISSION_GRANTED
-                && grantResults[4] == PackageManager.PERMISSION_GRANTED) {
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
 
             // permission was granted.
 
@@ -395,9 +386,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (success == 0) {
                 Log.e("Remiscar ", "sin mensajes.");
                 flg_mens = 0;
-                buttonMensajes.setText("Ver Mis Mensajes");
-                buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
-                buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
+                resetBotonMensajes();
             } else if (success == 1) {
                 Log.e("Remiscar ", "Hay mensajes.");
                 pedidoEnviado = false;
@@ -417,6 +406,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } catch (Exception e1) {
             e1.printStackTrace();
         }
+    }
+
+    private void resetBotonMensajes() {
+        buttonMensajes.setText("Ver Mensajes");
+        buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
+        buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
     }
 
     public String getMacAdd() {

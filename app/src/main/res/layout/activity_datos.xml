@@ -9,10 +9,10 @@
 
     <EditText
         android:id="@+id/editName"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="11dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="13dp"
         android:ems="10"
@@ -25,10 +25,10 @@
 
     <EditText
         android:id="@+id/editApellido"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -41,10 +41,10 @@
 
     <EditText
         android:id="@+id/editDomCasa"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -57,10 +57,10 @@
 
     <EditText
         android:id="@+id/editDomTrabajo"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -73,10 +73,10 @@
 
     <EditText
         android:id="@+id/editDomAlt"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -89,10 +89,10 @@
 
     <EditText
         android:id="@+id/editTelefono"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="21dp"
-        android:layout_marginEnd="153dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:ems="10"
@@ -106,7 +106,7 @@
 
     <TextView
         android:id="@+id/textView9"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="14dp"
         android:layout_marginEnd="171dp"

@@ -23,7 +23,7 @@
             android:text="Inicio"
             android:id="@+id/buttonRet"
             android:layout_gravity="center_horizontal"
-            android:background="#4863a0"
+            android:background="#0288D1"
             android:textColor="#d5d9ea"
             android:textSize="30dp"
             android:textStyle="bold" />

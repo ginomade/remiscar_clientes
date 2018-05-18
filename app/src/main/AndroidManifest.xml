@@ -41,9 +41,6 @@
             android:name=".SettingsActivity"
             android:label="Contacto" />
         <activity
-            android:name=".NovedadesActivity"
-            android:label="Contacto" />
-        <activity
             android:name=".WebActivity"
             android:label="REMISCAR" />
         <activity
