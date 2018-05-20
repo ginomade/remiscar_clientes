@@ -1,181 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.nomade.forma.app.DatosActivity">
 
-
-    <EditText
-        android:id="@+id/editName"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="11dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
-        android:ems="10"
-        android:hint="Nombre"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editApellido"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/editApellido"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Apellido"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editDomCasa"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editName" />
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="13dp"
+            android:ems="10"
+            android:hint="Nombre"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/editApellido"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
-    <EditText
-        android:id="@+id/editDomCasa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="9dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Domicilio Casa"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editDomTrabajo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editApellido" />
+        <EditText
+            android:id="@+id/editApellido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Apellido"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/editDomCasa"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editName" />
 
-    <RelativeLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/editDomCasa"
-        app:layout_constraintBottom_toBottomOf="@+id/editDomCasa"
-        android:background="@drawable/selector_button_background">
+        <EditText
+            android:id="@+id/editDomCasa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="9dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Domicilio Casa"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/editDomTrabajo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editApellido" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_home_white_24dp" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button_background"
+            app:layout_constraintBottom_toBottomOf="@+id/editDomCasa"
+            app:layout_constraintStart_toEndOf="@+id/editDomCasa">
 
-    <EditText
-        android:id="@+id/editDomTrabajo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="9dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Domicilio trabajo"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editDomAlt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDomCasa" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_home_white_24dp" />
+        </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/editDomTrabajo"
-        app:layout_constraintBottom_toBottomOf="@+id/editDomTrabajo"
-        android:background="@drawable/selector_button_background">
+        <EditText
+            android:id="@+id/editDomTrabajo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="9dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Domicilio trabajo"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/editDomAlt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editDomCasa" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_work_white_24dp" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button_background"
+            app:layout_constraintBottom_toBottomOf="@+id/editDomTrabajo"
+            app:layout_constraintStart_toEndOf="@+id/editDomTrabajo">
 
-    <EditText
-        android:id="@+id/editDomAlt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="9dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Domicilio alternativo"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editTelefono"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDomTrabajo" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_work_white_24dp" />
+        </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/editDomAlt"
-        app:layout_constraintBottom_toBottomOf="@+id/editDomAlt"
-        android:background="@drawable/selector_button_background">
+        <EditText
+            android:id="@+id/editDomAlt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="9dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Domicilio alternativo"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/editTelefono"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editDomTrabajo" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_youtube_searched_for_white_24dp" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button_background"
+            app:layout_constraintBottom_toBottomOf="@+id/editDomAlt"
+            app:layout_constraintStart_toEndOf="@+id/editDomAlt">
 
-    <EditText
-        android:id="@+id/editTelefono"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="21dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:hint="Telefono (sin 0 y sin 15)"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSend"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDomAlt" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_youtube_searched_for_white_24dp" />
+        </RelativeLayout>
 
-    <TextView
-        android:id="@+id/textView9"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
-        android:layout_marginEnd="171dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Complete sus datos personales"
-        app:layout_constraintBottom_toTopOf="@+id/editName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <EditText
+            android:id="@+id/editTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="21dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Telefono (sin 0 y sin 15)"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/buttonSend"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editDomAlt" />
 
-    <Button
-        android:id="@+id/buttonSend"
-        android:layout_width="354dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="11dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="2dp"
-        android:text="Guardar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:layout_marginEnd="171dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Complete sus datos personales"
+            app:layout_constraintBottom_toTopOf="@+id/editName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/buttonSend"
+            android:layout_width="354dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="Guardar"
+            android:textSize="22sp"
+            android:textColor="#ffffff"
+            android:background="#0288D1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

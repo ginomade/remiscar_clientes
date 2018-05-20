@@ -3,7 +3,6 @@ package com.nomade.forma.app;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,10 +20,13 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String telefono = "";
     public String prefijo = "";
     public String imei;
-    public Button Enviar;
+    public Button buttonEnviarPedido;
     public Button buttonMensajes;
     public Double lat;
     public Double lon;
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     SharedPrefsUtil sharedPrefs;
     private GooglePlayServicesHelper locationHelper;
     WebView vViajesView;
-    WebViewClient yourWebClient;
     RelativeLayout vHomeButton;
     RelativeLayout vWorkButton;
     RelativeLayout vOtrosButton;
@@ -93,11 +94,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Manifest.permission.READ_SMS,
             Manifest.permission.ACCESS_FINE_LOCATION};
 
-    static final String HOME = "CASA";
-    static final String WORK = "TRABAJO";
-    static final String OTHER = "ALTERNATIVO";
-
-
     private static final int MY_PERMISSIONS_REQUEST = 1;
 
     @Override
@@ -105,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
-        setupWebView();
+
         mHandler = new android.os.Handler();
 
         mContext = MainActivity.this;
@@ -125,9 +121,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //validar celu bloqueado
         ServiceUtils.validarImei(MainActivity.this);
 
-        //fecha y hora en pantalla
+        setupWebView();
 
         editTextMens = (EditText) findViewById(R.id.editTextMens);
+        editTextMens.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                buttonEnviarPedido.setEnabled(s.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //nothing
+
+            }
+        });
         textBloqueado = (TextView) findViewById(R.id.textBloqueado);
 
         setBotonesEnvio();
@@ -148,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onClick(View v) {
                 //manejar los mensajes al usuario con este boton
-                vViajesView.reload();
+                setupWebView();
                 resetBotonMensajes();
             }
         });
@@ -176,20 +189,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         }).start();
 
-        yourWebClient = new WebViewClient() {
-            // you tell the webclient you want to catch when a url is about to load
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
 
-            // here you execute an action when the URL you want is about to load
-            @Override
-            public void onLoadResource(WebView view, String url) {
-
-            }
-        };
     }
 
     private void initDatosUsuario() {
@@ -231,25 +231,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        Enviar = (Button) findViewById(R.id.buttonEnviar);
-        Enviar.setText("Solicitar Movil");
-        Enviar.setEnabled(true);
-        Enviar.setOnClickListener(new View.OnClickListener() {
+        buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
+        buttonEnviarPedido.setText("Solicitar Movil");
+        buttonEnviarPedido.setEnabled(false);
+        buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //envio de login
                 try {
                     mensaje = editTextMens.getText().toString();
-                    Enviar.setText("GRABANDO PEDIDO");
-                    Enviar.setBackgroundColor(Color.parseColor("#0020c2"));
-                    Enviar.setTextColor(Color.parseColor("#ffffff"));
+                    buttonEnviarPedido.setText("GRABANDO PEDIDO");
                     if (pedidoEnviado) {
                         Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
                     } else {
                         if (mensaje.equals("")) {
                             Toast.makeText(MainActivity.this, "Indique el origen del viaje.", Toast.LENGTH_SHORT).show();
-                            Enviar.setText("Indique el origen!!!");
+                            buttonEnviarPedido.setText("Indique el origen!!!");
                         } else {
 
                             if (telCompleto.toString().equals("")) {
@@ -296,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 //obtengo imei
                 imei = getPhoneImei();//"359781041848146"
                 sharedPrefs.saveString("imei", imei);
-                Log.i("Remiscar", "start imei "+ imei);
+                Log.i("Remiscar", "start imei " + imei);
             }
 
         } catch (Exception ex) {
@@ -321,11 +319,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void setupWebView() {
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
-        vViajesView.setWebViewClient(yourWebClient);
+        vViajesView.setWebViewClient(new WebViewClient() {
+            // you tell the webclient you want to catch when a url is about to load
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                vViajesView.loadUrl(url);
+                return false;
+            }
 
-        webSettings.setAllowFileAccessFromFileURLs(true);
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    vViajesView.loadUrl(request.getUrl().toString());
+                }
+                return false;
+            }
+
+            // here you execute an action when the URL you want is about to load
+            @Override
+            public void onLoadResource(WebView view, String url) {
+
+            }
+        });
+
         String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
-        Log.w("Remiscar", "viajes: "+ finalUrl);
+        Log.w("Remiscar", "viajes: " + finalUrl);
         vViajesView.loadUrl(finalUrl);
     }
 
@@ -584,14 +602,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void setBloqueado(){
+    private void setBloqueado() {
         textBloqueado.setVisibility(View.VISIBLE);
         vHomeButton.setEnabled(false);
         vWorkButton.setEnabled(false);
         vOtrosButton.setEnabled(false);
         vViajesView.setVisibility(View.GONE);
         buttonMensajes.setEnabled(false);
-        Enviar.setEnabled(false);
+        buttonEnviarPedido.setEnabled(false);
         vButtonDatos.setEnabled(false);
     }
 
@@ -602,8 +620,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (data.getDataString().equals("ok")) {
                 Toast.makeText(getBaseContext(), "Pedido enviado.", Toast.LENGTH_LONG).show();
                 pedidoEnviado = true;
-                Enviar.setEnabled(false);
-                Enviar.setText("Enviando");
+                buttonEnviarPedido.setEnabled(false);
+                buttonEnviarPedido.setText("Enviando");
             } else {
                 sharedPrefs.saveString("webresult", data.getDataString());
 

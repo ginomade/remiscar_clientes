@@ -112,7 +112,7 @@
                 android:id="@+id/buttonEnviar"
                 android:layout_gravity="center_horizontal"
                 android:layout_below="@id/editTextMens"
-                android:background="#0288D1"
+                android:background="@drawable/selector_button_background"
                 android:textColor="#d5d9ea"
                 android:textSize="22sp"
                 android:layout_marginTop="12dp"
