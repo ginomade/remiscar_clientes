@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void setupWebView() {
+        final String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
         vViajesView.setWebViewClient(new WebViewClient() {
@@ -324,13 +325,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 vViajesView.loadUrl(url);
+                try {
+                    Thread.sleep(2000);
+                    vViajesView.loadUrl(finalUrl);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    vViajesView.loadUrl(request.getUrl().toString());
+                    view.loadUrl(request.getUrl().toString());
+                    try {
+                        Thread.sleep(2000);
+                        view.loadUrl(finalUrl);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
@@ -342,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
+
         Log.w("Remiscar", "viajes: " + finalUrl);
         vViajesView.loadUrl(finalUrl);
     }
@@ -391,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         public void run() {
 
             ServiceUtils.getMensajes(mContext);
-
+            //setupWebView();
         }
     };
 
@@ -625,8 +638,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             } else {
                 sharedPrefs.saveString("webresult", data.getDataString());
 
-                Intent intent = new Intent(MainActivity.this, WebActivity.class);
-                startActivity(intent);
+                String webData = "<?xml version='1.0' encoding='utf-8'?><html><body>" + data.getDataString() + " </body></html>";
+                vViajesView.loadData(webData, "text/html; charset=UTF-8", null);
+
             }
 
         } catch (Exception e1) {

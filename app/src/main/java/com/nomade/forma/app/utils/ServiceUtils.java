@@ -171,10 +171,11 @@ public class ServiceUtils {
                 });
     }
 
-    public static void getReclamos(Context context, String imei, String celu, String mensaje) {
-        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-");
+    public static void getReclamos(Context context, String imei, String celu, String mensaje, String nombreUsuario) {
+        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-" + mensaje +nombreUsuario);
         Ion.with(context)
-                .load(url_reclamosMovil + "?&IMEI=" + imei + "&Celular=" + celu + "&Descripcion=" + mensaje)
+                .load(url_reclamosMovil + "?IMEI=" + imei + "&Celular=" + celu
+                        + "&Descripcion=" + mensaje + "&Pasajero=" + nombreUsuario)
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override

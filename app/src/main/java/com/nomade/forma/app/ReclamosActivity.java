@@ -2,7 +2,6 @@ package com.nomade.forma.app;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,13 +12,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 import com.nomade.forma.app.events.ReclamosEvent;
-import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.UnsupportedEncodingException;
@@ -38,7 +35,7 @@ public class ReclamosActivity extends AppCompatActivity {
     private static final String URL = "http://carlitosbahia.dynns.com/movil/reclamosMovil.php";
     String TAG_SUCCESS = "result";
     LinearLayout ll_mensaje, ll_confirmacion;
-
+    String tNombre, tApellido, tUsuario;
     Context mContext;
     SharedPrefsUtil sharedPrefs;
 
@@ -58,6 +55,9 @@ public class ReclamosActivity extends AppCompatActivity {
         telCompleto = sharedPrefs.getString("telefono", "");
         Log.e("Remiscar:", "Reclamos  - celu " + telCompleto);
         Log.e("Remiscar:", "Reclamos  - imei " + imei);
+        tNombre = sharedPrefs.getString("nombre", "");
+        tApellido = sharedPrefs.getString("apellido", "");
+        tUsuario = tNombre + " " + tApellido;
 
         ll_mensaje = (LinearLayout) findViewById(R.id.mensaje);
         ll_confirmacion = (LinearLayout) findViewById(R.id.confirmacion);
@@ -78,7 +78,10 @@ public class ReclamosActivity extends AppCompatActivity {
                         Toast.makeText(ReclamosActivity.this, "Escriba el mensaje.", Toast.LENGTH_SHORT).show();
                         send.setText("Escribir y enviar!!!");
                     } else {
-                        ServiceUtils.getReclamos(mContext, imei, telCompleto, texto);
+                        ServiceUtils.getReclamos(mContext, imei, telCompleto, texto,
+                                tUsuario);
+
+
                     }
 
                 } catch (UnsupportedEncodingException e) {
@@ -103,7 +106,7 @@ public class ReclamosActivity extends AppCompatActivity {
     }
 
     @Subscribe()
-    public void processReservas(ReclamosEvent data) {
+    public void processReclamo(ReclamosEvent data) {
 
         try {
             if (data.getDataString().contains("ok")) {
@@ -113,6 +116,13 @@ public class ReclamosActivity extends AppCompatActivity {
                 Toast.makeText(ReclamosActivity.this, "Error al enviar el mensaje.", Toast.LENGTH_SHORT).show();
 
             }
+            try {
+                Thread.sleep(5000);
+                finish();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
 
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -123,7 +133,7 @@ public class ReclamosActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        EventBus.getDefault().unregister(this);
         finish();
     }
 
@@ -141,6 +151,12 @@ public class ReclamosActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
     private void mostrarForm() {
         ll_confirmacion.setVisibility(View.GONE);
         ll_mensaje.setVisibility(View.VISIBLE);
@@ -149,6 +165,7 @@ public class ReclamosActivity extends AppCompatActivity {
     private void mostrarConf() {
         ll_confirmacion.setVisibility(View.VISIBLE);
         ll_mensaje.setVisibility(View.GONE);
+
     }
 
 }
