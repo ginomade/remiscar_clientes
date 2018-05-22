@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     SharedPrefsUtil sharedPrefs;
     private GooglePlayServicesHelper locationHelper;
     WebView vViajesView;
+
     RelativeLayout vHomeButton;
     RelativeLayout vWorkButton;
     RelativeLayout vOtrosButton;
@@ -110,84 +112,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
-        }
-
-
-        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
-
-        initialConfiguration();
-        initDatosUsuario();
-
-        //validar celu bloqueado
-        ServiceUtils.validarImei(MainActivity.this);
-
-        setupWebView();
-
-        editTextMens = (EditText) findViewById(R.id.editTextMens);
-        editTextMens.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //nothing
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                buttonEnviarPedido.setEnabled(s.length() > 0);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //nothing
-
-            }
-        });
-        textBloqueado = (TextView) findViewById(R.id.textBloqueado);
-
-        setBotonesEnvio();
-
-        vButtonDatos = (Button) findViewById(R.id.buttonDatos);
-        vButtonDatos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new
-                        Intent(MainActivity.this, DatosActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        //Envio de consulta de mensajes
-        buttonMensajes = (Button) findViewById(R.id.buttonMensajes);
-        buttonMensajes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //manejar los mensajes al usuario con este boton
-                setupWebView();
-                resetBotonMensajes();
-            }
-        });
-
-        if (!isOnline()) {
-            Toast.makeText(MainActivity.this, "No hay conexion de datos. Verifique su conexion.", Toast.LENGTH_SHORT).show();
-
         } else {
-
+            initialConfiguration();
         }
-
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!MainActivity.this.isFinishing()) {
-                    try {
-                        Thread.sleep(30000);
-
-                        mHandler.post(mMyRunnable);
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-        }).start();
 
 
     }
@@ -297,6 +224,81 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Log.i("Remiscar", "start imei " + imei);
             }
 
+            initDatosUsuario();
+
+            boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
+            //validar celu bloqueado
+            ServiceUtils.validarImei(MainActivity.this);
+
+            setupWebView();
+
+            editTextMens = (EditText) findViewById(R.id.editTextMens);
+            editTextMens.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    //nothing
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    buttonEnviarPedido.setEnabled(s.length() > 0);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    //nothing
+
+                }
+            });
+            textBloqueado = (TextView) findViewById(R.id.textBloqueado);
+
+            setBotonesEnvio();
+
+            vButtonDatos = (Button) findViewById(R.id.buttonDatos);
+            vButtonDatos.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new
+                            Intent(MainActivity.this, DatosActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            //Envio de consulta de mensajes
+            buttonMensajes = (Button) findViewById(R.id.buttonMensajes);
+            buttonMensajes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //manejar los mensajes al usuario con este boton
+                    setupWebView();
+                    resetBotonMensajes();
+                }
+            });
+
+            if (!isOnline()) {
+                Toast.makeText(MainActivity.this, "No hay conexion de datos. Verifique su conexion.", Toast.LENGTH_SHORT).show();
+
+            } else {
+
+            }
+
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!MainActivity.this.isFinishing()) {
+                        try {
+                            int time = 30000;
+                            Thread.sleep(time);
+
+                            mHandler.post(mMyRunnable);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                }
+            }).start();
+
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
             Log.e("error Forma", ex.toString());
@@ -320,17 +322,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         final String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
+        webSettings.setSupportMultipleWindows(true);
+        vViajesView.clearCache(true);
+        vViajesView.setWebChromeClient(new WebChromeClient());
+
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 vViajesView.loadUrl(url);
-                try {
-                    Thread.sleep(2000);
-                    vViajesView.loadUrl(finalUrl);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 return false;
             }
 
@@ -338,21 +338,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     view.loadUrl(request.getUrl().toString());
-                    try {
-                        Thread.sleep(2000);
-                        view.loadUrl(finalUrl);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
                 return false;
             }
 
-            // here you execute an action when the URL you want is about to load
-            @Override
-            public void onLoadResource(WebView view, String url) {
-
-            }
         });
 
 
@@ -389,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             // permission was granted.
 
-
+            initialConfiguration();
         } else {
 
             // permission denied.
@@ -402,9 +391,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Runnable mMyRunnable = new Runnable() {
         @Override
         public void run() {
-
             ServiceUtils.getMensajes(mContext);
-            //setupWebView();
+            setupWebView();
         }
     };
 
