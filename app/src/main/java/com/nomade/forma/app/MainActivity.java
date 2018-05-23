@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private Boolean pedidoEnviado = false;
 
+    //tiempo de refresco de webview en milisegundos
+    private static int REFRESH_TIME = 5000;
+
     Context mContext;
     SharedPrefsUtil sharedPrefs;
     private GooglePlayServicesHelper locationHelper;
@@ -159,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
-        buttonEnviarPedido.setText("Solicitar Movil");
-        buttonEnviarPedido.setEnabled(false);
+        setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,6 +193,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+    }
+
+    private void setBotonPedidoEstadoInicial() {
+        buttonEnviarPedido.setText("Solicitar Movil");
+        buttonEnviarPedido.setEnabled(false);
     }
 
     private void enviarPedidoConPreseleccion(String origen) {
@@ -225,12 +232,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
 
             initDatosUsuario();
+            setupWebView();
 
             boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
             ServiceUtils.validarImei(MainActivity.this);
 
-            setupWebView();
+
 
             editTextMens = (EditText) findViewById(R.id.editTextMens);
             editTextMens.addTextChangedListener(new TextWatcher() {
@@ -288,8 +296,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 public void run() {
                     while (!MainActivity.this.isFinishing()) {
                         try {
-                            int time = 30000;
-                            Thread.sleep(time);
+                            Thread.sleep(REFRESH_TIME);
 
                             mHandler.post(mMyRunnable);
                         } catch (Exception e) {
@@ -298,6 +305,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     }
                 }
             }).start();
+
+
 
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
@@ -322,9 +331,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         final String finalUrl = ServiceUtils.url_viajes + "?IMEI=" + imei + "&Celular=" + telCompleto;
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
-        webSettings.setSupportMultipleWindows(true);
-        vViajesView.clearCache(true);
-        vViajesView.setWebChromeClient(new WebChromeClient());
 
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
@@ -393,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         public void run() {
             ServiceUtils.getMensajes(mContext);
             setupWebView();
+            setBotonPedidoEstadoInicial();
         }
     };
 

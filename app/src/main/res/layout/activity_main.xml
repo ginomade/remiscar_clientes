@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/buttonEnviar"
                 android:layout_marginTop="12dp"
-                android:layout_above="@id/buttonsContaienr"
+                android:layout_above="@id/buttonsContainer"
                 android:id="@+id/wv_mensajes"/>
 
             <TextView
@@ -139,7 +139,7 @@
                 android:visibility="gone"/>
 
             <LinearLayout
-                android:id="@+id/buttonsContaienr"
+                android:id="@+id/buttonsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
