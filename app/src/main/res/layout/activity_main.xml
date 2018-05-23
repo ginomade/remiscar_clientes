@@ -93,7 +93,7 @@
                 android:typeface="sans"
                 android:layout_below="@id/ll_botones"
                 android:textIsSelectable="false"
-                android:textSize="18dp" />
+                android:textSize="18sp" />
 
             <EditText
                 android:layout_width="match_parent"

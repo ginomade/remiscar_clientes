@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String estadoWifi = "0";
     public String coordenadas;
     String telCompleto = "";
-    Handler mHandler;
     int flg_mens = 0; // flag para mensajes
 
     private Boolean pedidoEnviado = false;
@@ -96,7 +95,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Button vButtonDatos;
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_SMS,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.ACCESS_FINE_LOCATION};
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
-
-        mHandler = new android.os.Handler();
 
         mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
@@ -232,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
 
             initDatosUsuario();
-            setupWebView();
+
 
             boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
@@ -290,30 +288,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             }
 
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!MainActivity.this.isFinishing()) {
-                        try {
-                            Thread.sleep(REFRESH_TIME);
-
-                            mHandler.post(mMyRunnable);
-                        } catch (Exception e) {
-
-                        }
-                    }
-                }
-            }).start();
-
-
-
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
             Log.e("error Forma", ex.toString());
             finish();
         }
     }
+
+    final Handler handler = new Handler();
+    final Runnable runnableCode = new Runnable() {
+        @Override
+        public void run() {
+            ServiceUtils.getMensajes(mContext);
+            setupWebView();
+            setBotonPedidoEstadoInicial();
+            handler.postDelayed(runnableCode, REFRESH_TIME);
+        }
+    };
 
     private void irAReclamos() {
         try {
@@ -363,6 +354,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     ActivityCompat.checkSelfPermission(this, mPermission[1])
                             != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, mPermission[2])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[3])
                             != PackageManager.PERMISSION_GRANTED) {
 
                 ActivityCompat.requestPermissions(this,
@@ -380,7 +373,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
 
             // permission was granted.
 
@@ -393,15 +387,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
     }
-
-    private Runnable mMyRunnable = new Runnable() {
-        @Override
-        public void run() {
-            ServiceUtils.getMensajes(mContext);
-            setupWebView();
-            setBotonPedidoEstadoInicial();
-        }
-    };
 
     @Subscribe()
     public void processMensajes(MensajesEvent data) {
@@ -434,9 +419,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void resetBotonMensajes() {
-        buttonMensajes.setText("Ver Mensajes");
-        buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
-        buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
+        if(buttonMensajes != null) {
+            buttonMensajes.setText("Ver Mensajes");
+            buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
+            buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
+        }
     }
 
     public String getMacAdd() {
@@ -655,7 +642,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onPause();
         EventBus.getDefault().unregister(this);
         locationHelper.onPause();
-        mHandler.removeCallbacks(mMyRunnable);
+        handler.removeCallbacks(runnableCode);
+
     }
 
     @Override
@@ -665,6 +653,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationHelper.onResume(MainActivity.this);
         initDatosUsuario();
         setBotonesEnvio();
+        initialConfiguration();
+        handler.post(runnableCode);
     }
 
 }
