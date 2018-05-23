@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String telCompleto = "";
     int flg_mens = 0; // flag para mensajes
 
-    private Boolean pedidoEnviado = false;
+    private boolean pedidoEnviado = false;
+    private boolean enviandoPedido = false;
 
     //tiempo de refresco de webview en milisegundos
     private static int REFRESH_TIME = 5000;
@@ -160,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
+        enviandoPedido = true;
         setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             } else {
 
                                 ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje, tUsuario);
-
+                                enviandoPedido = true;
                             }
                         }
                     }
@@ -194,8 +196,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void setBotonPedidoEstadoInicial() {
-        buttonEnviarPedido.setText("Solicitar Movil");
-        buttonEnviarPedido.setEnabled(false);
+        if(enviandoPedido){
+            buttonEnviarPedido.setText("Solicitar Movil");
+            buttonEnviarPedido.setEnabled(false);
+            enviandoPedido = false;
+        }
     }
 
     private void enviarPedidoConPreseleccion(String origen) {
@@ -400,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             } else if (success == 1) {
                 Log.e("Remiscar ", "Hay mensajes.");
                 pedidoEnviado = false;
+                setBotonPedidoEstadoInicial();
                 if (flg_mens == 0) {
                     Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
                     final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.c2answer);
