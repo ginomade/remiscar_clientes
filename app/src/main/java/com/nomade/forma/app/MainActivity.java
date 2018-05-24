@@ -112,11 +112,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermissions();
-        } else {
-            initialConfiguration();
-        }
+
 
 
     }
@@ -200,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             buttonEnviarPedido.setText("Solicitar Movil");
             buttonEnviarPedido.setEnabled(false);
             enviandoPedido = false;
+            editTextMens.setText("");
         }
     }
 
@@ -227,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     estadoWifi = "1";
                 }
 
-                telefono = getPhoneNumber();
                 //obtengo imei
                 imei = getPhoneImei();//"359781041848146"
                 sharedPrefs.saveString("imei", imei);
@@ -366,6 +362,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 ActivityCompat.requestPermissions(this,
                         mPermission, MY_PERMISSIONS_REQUEST);
 
+            } else {
+                initialConfiguration();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -471,25 +469,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return super.onOptionsItemSelected(item);
     }
 
-    //Obtener numero de movil
-    private String getPhoneNumber() {
-        TelephonyManager mTelephonyManager;
-        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-
-        }
-        assert mTelephonyManager != null;
-        return mTelephonyManager.getLine1Number();
-    }
-
     //Obtener numero de imei
     private String getPhoneImei() {
-        TelephonyManager mTelephonyManager;
-        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            TelephonyManager mTelephonyManager;
+            mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            return mTelephonyManager.getDeviceId();
         }
-        return mTelephonyManager.getDeviceId();
+        return "";
     }
 
 
@@ -657,9 +645,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
         locationHelper.onResume(MainActivity.this);
-        initDatosUsuario();
+        /*initDatosUsuario();
         setBotonesEnvio();
-        initialConfiguration();
+        initialConfiguration();*/
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        } else {
+            initialConfiguration();
+        }
         handler.post(runnableCode);
     }
 
