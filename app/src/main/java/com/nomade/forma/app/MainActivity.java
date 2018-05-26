@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -26,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -56,7 +58,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class   MainActivity extends AppCompatActivity implements LocationListener {
 
     public EditText editTextMens;
     public String telefono = "";
@@ -112,9 +114,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-
-
-
     }
 
     private void initDatosUsuario() {
@@ -167,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 try {
                     mensaje = editTextMens.getText().toString();
                     buttonEnviarPedido.setText("GRABANDO PEDIDO");
+                    hideKeyboard(MainActivity.this);
                     if (pedidoEnviado) {
                         Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
                     } else {
@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             buttonEnviarPedido.setEnabled(false);
             enviandoPedido = false;
             editTextMens.setText("");
+            hideKeyboard(MainActivity.this);
         }
     }
 
@@ -235,9 +236,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
-            ServiceUtils.validarImei(MainActivity.this);
-
-
+            if(imei.equals("")){
+                Toast.makeText(mContext, "Error de sistema. No se puede obtener imei.", Toast.LENGTH_LONG);
+                Log.e("remiscar", "error obteniendo imei.");
+                finish();
+            }else{
+                ServiceUtils.validarImei(MainActivity.this);
+            }
 
             editTextMens = (EditText) findViewById(R.id.editTextMens);
             editTextMens.addTextChangedListener(new TextWatcher() {
@@ -291,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
-            Log.e("error Forma", ex.toString());
+            Log.e("remiscar", ex.toString());
             finish();
         }
     }
@@ -350,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void checkPermissions() {
         try {
-            if (ActivityCompat.checkSelfPermission(this, mPermission[0])
+            if (ContextCompat.checkSelfPermission(this, mPermission[0])
                     != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, mPermission[1])
                             != PackageManager.PERMISSION_GRANTED ||
@@ -472,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Obtener numero de imei
     private String getPhoneImei() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager mTelephonyManager;
             mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             return mTelephonyManager.getDeviceId();
@@ -656,4 +661,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         handler.post(runnableCode);
     }
 
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 }
