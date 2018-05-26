@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -45,7 +43,6 @@ import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
-import com.nomade.forma.app.utils.GooglePlayServicesHelper;
 import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
@@ -58,7 +55,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-public class   MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity {
 
     public EditText editTextMens;
     public String telefono = "";
@@ -66,8 +63,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
     public String imei;
     public Button buttonEnviarPedido;
     public Button buttonMensajes;
-    public Double lat;
-    public Double lon;
     public String url;
     static String direccion = "";
     public String mensaje;
@@ -85,7 +80,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
 
     Context mContext;
     SharedPrefsUtil sharedPrefs;
-    private GooglePlayServicesHelper locationHelper;
     WebView vViajesView;
 
     RelativeLayout vHomeButton;
@@ -99,8 +93,7 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.ACCESS_FINE_LOCATION};
+            Manifest.permission.ACCESS_WIFI_STATE};
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
 
@@ -112,7 +105,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
 
         mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
-        locationHelper = new GooglePlayServicesHelper(this, true);
 
     }
 
@@ -192,7 +184,7 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
     }
 
     private void setBotonPedidoEstadoInicial() {
-        if(enviandoPedido){
+        if (enviandoPedido) {
             buttonEnviarPedido.setText("Solicitar Movil");
             buttonEnviarPedido.setEnabled(false);
             enviandoPedido = false;
@@ -236,11 +228,11 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
 
             boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
-            if(imei.equals("")){
+            if (imei.equals("")) {
                 Toast.makeText(mContext, "Error de sistema. No se puede obtener imei.", Toast.LENGTH_LONG);
                 Log.e("remiscar", "error obteniendo imei.");
                 finish();
-            }else{
+            } else {
                 ServiceUtils.validarImei(MainActivity.this);
             }
 
@@ -360,8 +352,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
                     ActivityCompat.checkSelfPermission(this, mPermission[1])
                             != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, mPermission[2])
-                            != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, mPermission[3])
                             != PackageManager.PERMISSION_GRANTED) {
 
                 ActivityCompat.requestPermissions(this,
@@ -381,8 +371,7 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                && grantResults[2] == PackageManager.PERMISSION_GRANTED
-                && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
 
             // permission was granted.
 
@@ -428,7 +417,7 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
     }
 
     private void resetBotonMensajes() {
-        if(buttonMensajes != null) {
+        if (buttonMensajes != null) {
             buttonMensajes.setText("Ver Mensajes");
             buttonMensajes.setBackgroundColor(Color.parseColor("#4863a0"));
             buttonMensajes.setTextColor(Color.parseColor("#d5d9ea"));
@@ -470,6 +459,10 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
             return true;
         } else if (id == R.id.action_reclamos) {
             irAReclamos();
+        } else if (id == R.id.action_privacy) {
+            Intent intent = new
+                    Intent(MainActivity.this, PrivacyActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -483,23 +476,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
             return mTelephonyManager.getDeviceId();
         }
         return "";
-    }
-
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        String str = location.getLatitude() + "," + location.getLongitude();
-        lat = (Double) location.getLatitude();
-        lon = (Double) location.getLongitude();
-        coordenadas = str;
-
-    }
-
-    private void getSingleLocation() {
-        Location singleLocation = locationHelper.getLastLocation();
-        lat = (Double) singleLocation.getLatitude();
-        lon = (Double) singleLocation.getLongitude();
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -640,7 +616,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
-        locationHelper.onPause();
         handler.removeCallbacks(runnableCode);
 
     }
@@ -649,10 +624,6 @@ public class   MainActivity extends AppCompatActivity implements LocationListene
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        locationHelper.onResume(MainActivity.this);
-        /*initDatosUsuario();
-        setBotonesEnvio();
-        initialConfiguration();*/
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         } else {

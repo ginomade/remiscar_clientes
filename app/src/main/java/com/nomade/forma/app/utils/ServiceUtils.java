@@ -36,6 +36,7 @@ public class ServiceUtils {
     public static String url_viajes = base_url + "origen.php";
     private static String url_reclamosMovil = base_url + "reclamosMovil.php";
     private static String url_celu_bloqueado = base_url + "Mcelubloqueado.php";
+    public static String url_privacy = "http://www.remiscar.com.ar/condiciones/";
 
     public static void asUbicacion(Context context, String url_ubicacion) {
         Ion.with(context)
