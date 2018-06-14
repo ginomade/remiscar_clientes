@@ -3,17 +3,12 @@ package com.nomade.forma.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -22,10 +17,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 import com.nomade.forma.app.events.MensajesEvent;
-import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.ViajesEvent;
 import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;

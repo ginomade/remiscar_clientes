@@ -1,20 +1,19 @@
 package com.nomade.forma.app;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
 public class DatosActivity extends AppCompatActivity {
 
     EditText tNombre, tApellido, tDireccionCasa,
-    tDireccionTrabajo, tDireccionAlt, tTelefono;
+            tDireccionTrabajo, tDireccionAlt, tTelefono;
     Button bSend;
 
     Context mContext;
@@ -36,11 +35,11 @@ public class DatosActivity extends AppCompatActivity {
         bSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(tNombre.getText().toString().equals("")
+                if (tNombre.getText().toString().equals("")
                         || tApellido.getText().toString().equals("")
-                        || tTelefono.getText().toString().equals("")){
+                        || tTelefono.getText().toString().equals("")) {
                     Toast.makeText(mContext, "Falta Nombre, Apellido o Telefono", Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     sharedPrefs.saveString("nombre", tNombre.getText().toString());
                     sharedPrefs.saveString("apellido", tApellido.getText().toString());
                     sharedPrefs.saveString("direccion_casa", tDireccionCasa.getText().toString());

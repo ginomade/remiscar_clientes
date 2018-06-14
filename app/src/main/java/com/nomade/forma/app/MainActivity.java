@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -43,6 +44,7 @@ import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
+import com.nomade.forma.app.utils.GooglePlayServicesHelper;
 import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
@@ -55,7 +57,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     public EditText editTextMens;
     public String telefono = "";
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public String mensaje;
     public TextView textBloqueado;
     public String estadoWifi = "0";
-    public String coordenadas;
+    public String coordenadas = "";
     String telCompleto = "";
     int flg_mens = 0; // flag para mensajes
 
@@ -77,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
     //tiempo de refresco de webview en milisegundos
     private static int REFRESH_TIME = 5000;
+
+    private GooglePlayServicesHelper locationHelper;
 
     Context mContext;
     SharedPrefsUtil sharedPrefs;
@@ -93,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_WIFI_STATE};
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.ACCESS_FINE_LOCATION};
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
 
@@ -102,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
+
+        locationHelper = new GooglePlayServicesHelper(this, true);
 
         mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
@@ -286,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
+
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "Error de ejecucion." + ex.toString(), Toast.LENGTH_SHORT).show();
             Log.e("remiscar", ex.toString());
@@ -300,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
             ServiceUtils.getMensajes(mContext);
             setupWebView();
             setBotonPedidoEstadoInicial();
+
             handler.postDelayed(runnableCode, REFRESH_TIME);
         }
     };
@@ -352,6 +361,8 @@ public class MainActivity extends AppCompatActivity {
                     ActivityCompat.checkSelfPermission(this, mPermission[1])
                             != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, mPermission[2])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, mPermission[3])
                             != PackageManager.PERMISSION_GRANTED) {
 
                 ActivityCompat.requestPermissions(this,
@@ -371,7 +382,8 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
 
             // permission was granted.
 
@@ -616,6 +628,7 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
+        locationHelper.onPause();
         handler.removeCallbacks(runnableCode);
 
     }
@@ -624,12 +637,17 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         } else {
             initialConfiguration();
         }
         handler.post(runnableCode);
+
+        if (locationHelper != null) {
+            locationHelper.onResume(this);
+        }
     }
 
     public static void hideKeyboard(Activity activity) {
@@ -641,5 +659,20 @@ public class MainActivity extends AppCompatActivity {
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        String str = location.getLatitude() + "," + location.getLongitude();
+        coordenadas = str;
+        Log.d("Remiscar ", " - set location -" + str);
+    }
+
+    private void getSingleLocation() {
+        if (locationHelper != null) {
+            Location singleLocation = locationHelper.getLastLocation();
+            String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
+            coordenadas = str;
+        }
     }
 }

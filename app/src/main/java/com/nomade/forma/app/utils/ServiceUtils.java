@@ -1,19 +1,11 @@
 package com.nomade.forma.app.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.nomade.forma.app.MainActivity;
-import com.nomade.forma.app.R;
-import com.nomade.forma.app.ReclamosActivity;
-import com.nomade.forma.app.WebActivity;
 import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReclamosEvent;
@@ -77,7 +69,7 @@ public class ServiceUtils {
                 });
     }
 
-    public static void getMensajes(Context context){
+    public static void getMensajes(Context context) {
         try {
 
             Ion.with(context)
