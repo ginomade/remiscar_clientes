@@ -119,6 +119,13 @@
                 android:layout_margin="5dp"
                 android:textStyle="bold" />
 
+            <FrameLayout
+                android:id="@+id/fl_location_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/buttonEnviar"
+                android:background="@color/wallet_hint_foreground_holo_light"/>
+
             <WebView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

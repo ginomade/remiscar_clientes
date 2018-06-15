@@ -34,6 +34,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     RelativeLayout vHomeButton;
     RelativeLayout vWorkButton;
     RelativeLayout vOtrosButton;
+    FrameLayout vLocIndicator;
 
     String tNombre, tApellido, tDireccionCasa,
             tDireccionTrabajo, tDireccionAlt, tUsuario;
@@ -107,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
-
+        vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
         mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
-
+        setLocationOff();
     }
 
     private void initDatosUsuario() {
@@ -198,6 +200,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             editTextMens.setText("");
             hideKeyboard(MainActivity.this);
         }
+    }
+
+    private void setLocationOn() {
+        vLocIndicator.setBackgroundColor(Color.GREEN);
+    }
+
+    private void setLocationOff() {
+        vLocIndicator.setBackgroundColor(Color.GRAY);
     }
 
     private void enviarPedidoConPreseleccion(String origen) {
@@ -666,6 +676,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String str = location.getLatitude() + "," + location.getLongitude();
         coordenadas = str;
         Log.d("Remiscar ", " - set location -" + str);
+        setLocationOn();
     }
 
     private void getSingleLocation() {
@@ -673,6 +684,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Location singleLocation = locationHelper.getLastLocation();
             String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
             coordenadas = str;
+            setLocationOn();
         }
     }
 }
