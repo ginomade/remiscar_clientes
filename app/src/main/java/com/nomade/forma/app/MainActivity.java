@@ -320,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             setBotonPedidoEstadoInicial();
 
             handler.postDelayed(runnableCode, REFRESH_TIME);
+            getSingleLocation();
         }
     };
 
@@ -673,17 +674,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        String str = location.getLatitude() + "," + location.getLongitude();
-        coordenadas = str;
-        Log.d("Remiscar ", " - set location -" + str);
-        setLocationOn();
+        if(location != null) {
+            String str = location.getLatitude() + "," + location.getLongitude();
+            coordenadas = str;
+            Log.d("Remiscar ", " - set location -" + str);
+            setLocationOn();
+        }
     }
 
     private void getSingleLocation() {
         if (locationHelper != null) {
             Location singleLocation = locationHelper.getLastLocation();
-            String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
-            coordenadas = str;
+            if(singleLocation != null) {
+                String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
+                coordenadas = str;
+            }
             setLocationOn();
         }
     }
