@@ -90,7 +90,7 @@ public class GooglePlayServicesHelper implements GoogleApiClient.ConnectionCallb
     public void onConnected(Bundle bundle) {
         log("onConnected()");
 
-        LocationRequest mLocationRequest = new LocationRequest();
+        LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(LOCATION_GPS_INTERVAL_MILLIS); // 10 segundos
         mLocationRequest.setFastestInterval(LOCATION_GPS_FASTEST_INTERVAL_MILLIS); // 5 segundos
         mLocationRequest.setPriority(LOCATION_GPS_PRIORITY);
