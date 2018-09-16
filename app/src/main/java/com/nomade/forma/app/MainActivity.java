@@ -4,11 +4,13 @@ package com.nomade.forma.app;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,8 +19,10 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -108,11 +112,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = MainActivity.this;
+
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
+
+
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-        mContext = MainActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         setLocationOff();
     }
@@ -654,6 +661,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else {
             initialConfiguration();
         }
+        checkLocationServices();
+
         handler.post(runnableCode);
 
         if (locationHelper != null) {
@@ -690,6 +699,42 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 coordenadas = str;
             }
             setLocationOn();
+        }
+    }
+
+    private void checkLocationServices(){
+        LocationManager lm = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        if(!gps_enabled && !network_enabled) {
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            dialog.setMessage("Activar localización");
+            dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    mContext.startActivity(myIntent);
+                    //get gps
+                }
+            });
+            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+
+                }
+            });
+            dialog.show();
         }
     }
 }
