@@ -487,6 +487,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_pagos) {
+            Intent intent = new Intent(this, PaymentActivity.class);
+            startActivity(intent);
         } else if (id == R.id.action_reclamos) {
             irAReclamos();
         } else if (id == R.id.action_privacy) {
