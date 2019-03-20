@@ -8,6 +8,7 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MensajesEvent;
+import com.nomade.forma.app.events.MpPreferenceEvent;
 import com.nomade.forma.app.events.ReclamosEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
@@ -154,6 +155,35 @@ public class ServiceUtils {
                                 EventBus.getDefault().post(event);
                             } else {
                                 Log.d("Remiscar* ", "error en respuesta de viajes.");
+                            }
+
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+
+                    }
+                });
+    }
+
+    public static void getMPPreferenceId(Context context, String imei, String celu) {
+        Log.w("remiscar", "getMPPreferenceId - " + imei + "-" + celu);
+        Ion.with(context)
+                .load(url_viajes)
+                .setBodyParameter("IMEI", imei)
+                .setBodyParameter("Celular", celu)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject data) {
+                        try {
+                            if (data != null) {
+                                String result = data.get("result").getAsString();
+                                String id = data.get("preference_id").getAsString();
+                                MpPreferenceEvent event = new MpPreferenceEvent();
+                                event.setObject(data);
+                                EventBus.getDefault().post(event);
+                            } else {
+                                Log.d("Remiscar* ", "error en getMPPreferenceId.");
                             }
 
                         } catch (Exception e1) {

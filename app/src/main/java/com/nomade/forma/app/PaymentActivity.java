@@ -5,12 +5,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.nomade.forma.app.events.MpPreferenceEvent;
+import com.nomade.forma.app.utils.ServiceUtils;
+import com.nomade.forma.app.utils.SharedPrefsUtil;
+
+import org.greenrobot.eventbus.Subscribe;
 
 public class PaymentActivity extends AppCompatActivity {
 
@@ -18,6 +25,12 @@ public class PaymentActivity extends AppCompatActivity {
     private static final String PUBLIC_KEY = "TEST-ad365c37-8012-4014-84f5-6c895b3f8e0a";
     private static int REQUEST_CODE = 11;
     Context context;
+    SharedPrefsUtil sharedPrefs;
+    String telCompleto;
+    String imei;
+    Button vPayButton;
+
+    String checkoutPreferenceId = PREFERENCE_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +38,40 @@ public class PaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment);
 
         context = PaymentActivity.this;
+        sharedPrefs = SharedPrefsUtil.getInstance(context);
+        vPayButton = (Button) findViewById(R.id.payButton);
+        vPayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submit();
+            }
+        });
+        vPayButton.setEnabled(false);
+
+        imei = sharedPrefs.getString("imei", "");
+        telCompleto = sharedPrefs.getString("telefono", "");
+
+        getPreferenceId();
     }
 
-    // Método ejecutado al hacer clic en el botón
-    public void submit(View view) {
+    private void getPreferenceId() {
+        ServiceUtils.getMPPreferenceId(context, imei, telCompleto);
+    }
 
-        String checkoutPreferenceId = PREFERENCE_ID;
+    public void submit() {
+
         startMercadoPagoCheckout(checkoutPreferenceId);
 
+    }
+
+    @Subscribe()
+    public void processPreferenceEvent(MpPreferenceEvent data) {
+        JsonObject result = data.getObject();
+        int success = result.get("result").getAsInt();
+        if (success == 0) {
+            checkoutPreferenceId = result.get("preference_id").getAsString();
+            vPayButton.setEnabled(true);
+        }
     }
 
     /*
