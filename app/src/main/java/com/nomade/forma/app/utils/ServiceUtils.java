@@ -30,6 +30,7 @@ public class ServiceUtils {
     private static String url_reclamosMovil = base_url + "reclamosMovil.php";
     private static String url_celu_bloqueado = base_url + "Mcelubloqueado.php";
     public static String url_privacy = "http://www.remiscar.com.ar/condiciones/";
+    public static String url_payment_pref = base_url + "checkout.php";
 
     public static void asUbicacion(Context context, String url_ubicacion) {
         Ion.with(context)
@@ -168,7 +169,7 @@ public class ServiceUtils {
     public static void getMPPreferenceId(Context context, String imei, String celu) {
         Log.w("remiscar", "getMPPreferenceId - " + imei + "-" + celu);
         Ion.with(context)
-                .load(url_viajes)
+                .load(url_payment_pref)
                 .setBodyParameter("IMEI", imei)
                 .setBodyParameter("Celular", celu)
                 .asJsonObject()
