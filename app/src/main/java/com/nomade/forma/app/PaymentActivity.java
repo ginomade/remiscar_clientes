@@ -2,10 +2,12 @@ package com.nomade.forma.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
@@ -17,6 +19,7 @@ import com.nomade.forma.app.events.MpPreferenceEvent;
 import com.nomade.forma.app.utils.ServiceUtils;
 import com.nomade.forma.app.utils.SharedPrefsUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class PaymentActivity extends AppCompatActivity {
@@ -29,6 +32,7 @@ public class PaymentActivity extends AppCompatActivity {
     String telCompleto;
     String imei;
     Button vPayButton;
+    ProgressBar vProgress;
 
     String checkoutPreferenceId = PREFERENCE_ID;
 
@@ -48,10 +52,24 @@ public class PaymentActivity extends AppCompatActivity {
         });
         vPayButton.setEnabled(false);
 
+        vProgress = (ProgressBar) findViewById(R.id.progressBar2);
+
         imei = sharedPrefs.getString("imei", "");
         telCompleto = sharedPrefs.getString("telefono", "");
 
         getPreferenceId();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
     }
 
     private void getPreferenceId() {
@@ -68,6 +86,7 @@ public class PaymentActivity extends AppCompatActivity {
     public void processPreferenceEvent(MpPreferenceEvent data) {
         JsonObject result = data.getObject();
         int success = result.get("result").getAsInt();
+        vProgress.setVisibility(View.GONE);
         if (success == 0) {
             checkoutPreferenceId = result.get("preference_id").getAsString();
             vPayButton.setEnabled(true);
@@ -117,19 +136,25 @@ public class PaymentActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
-                ((TextView) findViewById(R.id.mp_results)).setText("Resultado del pago: " + payment.getPaymentStatus());
+                setMessage("Resultado del pago: " + payment.getPaymentStatus());
                 //Done!
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getExtras() != null
                         && data.getExtras().containsKey(MercadoPagoCheckout.EXTRA_ERROR)) {
                     final MercadoPagoError mercadoPagoError =
                             (MercadoPagoError) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_ERROR);
-                    ((TextView) findViewById(R.id.mp_results)).setText("Error: " + mercadoPagoError.getMessage());
+                    setMessage("Error: " + mercadoPagoError.getMessage());
                     //Resolve error in checkout
                 } else {
                     //Resolve canceled checkout
                 }
             }
         }
+    }
+
+    private void setMessage(String mess){
+        TextView vMessage = (TextView) findViewById(R.id.mp_results);
+        vMessage.setVisibility(View.VISIBLE);
+        vMessage.setText(mess);
     }
 }
