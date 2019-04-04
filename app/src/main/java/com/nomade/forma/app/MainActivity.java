@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public TextView textBloqueado;
     public String estadoWifi = "0";
     public String coordenadas = "";
+    public String reservas = "";
     String telCompleto = "";
     int flg_mens = 0; // flag para mensajes
 
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String tNombre, tApellido, tDireccionCasa,
             tDireccionTrabajo, tDireccionAlt, tUsuario;
 
-    Button vButtonDatos;
+    Button vButtonDatos, vBtnPagos;
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.INTERNET,
@@ -116,11 +117,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
+        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
 
-
+        reservas = "";
+        guardarReserva(reservas);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
         setLocationOff();
     }
 
@@ -132,6 +134,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tDireccionAlt = sharedPrefs.getString("direccion_alt", "");
         telCompleto = sharedPrefs.getString("telefono", "");
         tUsuario = tNombre + " " + tApellido;
+    }
+
+    private void guardarReserva(String reserva){
+        sharedPrefs.saveString("reserva", reserva);
     }
 
     private void setBotonesEnvio() {
@@ -197,6 +203,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+
+        vBtnPagos = (Button) findViewById(R.id.buttonPagos);
+        vBtnPagos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PaymentActivity.class);
+                startActivity(intent);
+            }
+        });
+        enableButtonPagos(false);
     }
 
     private void setBotonPedidoEstadoInicial() {
@@ -454,6 +470,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    private void enableButtonPagos(boolean enable){
+        vBtnPagos.setEnabled(enable);
+    }
+
     public String getMacAdd() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
@@ -487,9 +507,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_pagos) {
-            Intent intent = new Intent(this, PaymentActivity.class);
-            startActivity(intent);
+
         } else if (id == R.id.action_reclamos) {
             irAReclamos();
         } else if (id == R.id.action_privacy) {

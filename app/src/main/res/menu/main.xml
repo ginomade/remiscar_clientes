@@ -1,25 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.nomade.forma.app.MainActivity" >
-    
-    <item android:id="@+id/action_settings"
+    tools:context="com.nomade.forma.app.MainActivity">
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
         android:title="Contacto"
-        android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/action_reclamos"
+    <item
+        android:id="@+id/action_reclamos"
+        android:orderInCategory="100"
         android:title="Reclamos"
-        android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/action_privacy"
+    <item
+        android:id="@+id/action_privacy"
+        android:orderInCategory="100"
         android:title="Politicas de Privacidad"
-        android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/action_pagos"
-        android:title="Pagos"
+    <item
         android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item android:title="Version 2.2"
-        android:orderInCategory="100"
+        android:title="Version 2.2"
         app:showAsAction="never" />
 </menu>

@@ -166,12 +166,13 @@ public class ServiceUtils {
                 });
     }
 
-    public static void getMPPreferenceId(Context context, String imei, String celu) {
+    public static void getMPPreferenceId(Context context, String imei, String celu, String reserva) {
         Log.w("remiscar", "getMPPreferenceId - " + imei + "-" + celu);
         Ion.with(context)
                 .load(url_payment_pref)
                 .setBodyParameter("IMEI", imei)
                 .setBodyParameter("Celular", celu)
+                .setBodyParameter("RESERVAS", reserva)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override

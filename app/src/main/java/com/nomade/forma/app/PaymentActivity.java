@@ -29,7 +29,7 @@ public class PaymentActivity extends AppCompatActivity {
     private static int REQUEST_CODE = 11;
     Context context;
     SharedPrefsUtil sharedPrefs;
-    String telCompleto;
+    String telCompleto, reserva;
     String imei;
     Button vPayButton;
     ProgressBar vProgress;
@@ -56,6 +56,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         imei = sharedPrefs.getString("imei", "");
         telCompleto = sharedPrefs.getString("telefono", "");
+        reserva = sharedPrefs.getString("reserva", "");
 
         getPreferenceId();
     }
@@ -73,7 +74,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void getPreferenceId() {
-        ServiceUtils.getMPPreferenceId(context, imei, telCompleto);
+        ServiceUtils.getMPPreferenceId(context, imei, telCompleto, reserva);
     }
 
     public void submit() {
