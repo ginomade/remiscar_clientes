@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.nomade.forma.app.events.BloqueadoEvent;
+import com.nomade.forma.app.events.MainViewEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.MpPreferenceEvent;
 import com.nomade.forma.app.events.ReclamosEvent;
@@ -15,6 +16,10 @@ import com.nomade.forma.app.events.UbicacionEvent;
 import com.nomade.forma.app.events.ViajesEvent;
 
 import org.greenrobot.eventbus.EventBus;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.nio.charset.Charset;
 
@@ -224,5 +229,31 @@ public class ServiceUtils {
 
                     }
                 });
+    }
+
+    public static void getMainData(String url){
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    String data = "";
+                    Document doc = Jsoup.connect(url).get();
+                    Elements elements = doc.getAllElements();
+                    for (Element element : elements) {
+                        if (!element.select("tbody").isEmpty()) {
+                            data = element.outerHtml() + "<br/>";
+                            break;
+                        }
+                    }
+                    MainViewEvent event = new MainViewEvent();
+                    event.setContent(data);
+                    EventBus.getDefault().post(event);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
     }
 }

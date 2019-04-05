@@ -55,6 +55,10 @@ import com.nomade.forma.app.utils.SharedPrefsUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tUsuario = tNombre + " " + tApellido;
     }
 
-    private void guardarReserva(String reserva){
+    private void guardarReserva(String reserva) {
         sharedPrefs.saveString("reserva", reserva);
     }
 
@@ -364,6 +368,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
 
+        ServiceUtils.getMainData(finalUrl);
+
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
             @Override
@@ -383,8 +389,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
 
-        Log.w("Remiscar", "viajes: " + finalUrl);
-        vViajesView.loadUrl(finalUrl);
+    }
+
+    private void extractString(Document doc) {
+        int value = doc.outerHtml().indexOf("remis");
+        Log.w("remiscar", "index remis " + value);
+    }
+
+    @Subscribe()
+    public void processMensajes(MensajesEvent data) {
+        vViajesView.loadData(data.getObject(), "text/html", "UTF-8");
     }
 
 
@@ -470,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void enableButtonPagos(boolean enable){
+    private void enableButtonPagos(boolean enable) {
         vBtnPagos.setEnabled(enable);
     }
 
@@ -704,7 +718,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location != null) {
+        if (location != null) {
             String str = location.getLatitude() + "," + location.getLongitude();
             coordenadas = str;
             Log.d("Remiscar ", " - set location -" + str);
@@ -715,7 +729,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getSingleLocation() {
         if (locationHelper != null) {
             Location singleLocation = locationHelper.getLastLocation();
-            if(singleLocation != null) {
+            if (singleLocation != null) {
                 String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
                 coordenadas = str;
             }
@@ -723,27 +737,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void checkLocationServices(){
-        LocationManager lm = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+    private void checkLocationServices() {
+        LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
         boolean network_enabled = false;
 
         try {
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
-        if(!gps_enabled && !network_enabled) {
+        if (!gps_enabled && !network_enabled) {
             // notify user
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             dialog.setMessage("Activar localización");
             dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     mContext.startActivity(myIntent);
                     //get gps
                 }
