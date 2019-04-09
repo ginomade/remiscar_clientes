@@ -46,6 +46,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.JsonObject;
 import com.nomade.forma.app.events.BloqueadoEvent;
+import com.nomade.forma.app.events.MainViewEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
@@ -55,10 +56,6 @@ import com.nomade.forma.app.utils.SharedPrefsUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String reservas = "";
     String telCompleto = "";
     int flg_mens = 0; // flag para mensajes
+
+    String webContent = "";
 
     private boolean pedidoEnviado = false;
     private boolean enviandoPedido = false;
@@ -128,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationHelper = new GooglePlayServicesHelper(this, true);
 
         setLocationOff();
+        setupWebView();
+
     }
 
     private void initDatosUsuario() {
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void guardarReserva(String reserva) {
         sharedPrefs.saveString("reserva", reserva);
+        reservas = reserva;
     }
 
     private void setBotonesEnvio() {
@@ -388,17 +390,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         });
 
+        vViajesView.loadData(webContent, "text/html", "UTF-8");
 
     }
 
-    private void extractString(Document doc) {
-        int value = doc.outerHtml().indexOf("remis");
-        Log.w("remiscar", "index remis " + value);
+    private void extractReserva(String doc) {
+        //int value = doc.indexOf("Reserva");
+        if (!doc.equals("")) {
+            Log.w("remiscar", "Reserva " + doc);
+            //Log.w("remiscar", "RET MAIN -" + doc);
+        }
+        enableButtonPagos(!doc.equals(""));
+        guardarReserva(doc);
     }
 
     @Subscribe()
-    public void processMensajes(MensajesEvent data) {
-        vViajesView.loadData(data.getObject(), "text/html", "UTF-8");
+    public void processWebview(MainViewEvent data) {
+        webContent = data.getContent();
+        extractReserva(data.getReserva());
     }
 
 
@@ -485,7 +494,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void enableButtonPagos(boolean enable) {
-        vBtnPagos.setEnabled(enable);
+        if (vBtnPagos != null) {
+            vBtnPagos.setEnabled(enable);
+        }
     }
 
     public String getMacAdd() {
@@ -720,6 +731,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         if (location != null) {
             String str = location.getLatitude() + "," + location.getLongitude();
+            //54°48'02.1"S 68°17'21.9"W -54.4802,-68.1721
             coordenadas = str;
             Log.d("Remiscar ", " - set location -" + str);
             setLocationOn();

@@ -231,13 +231,15 @@ public class ServiceUtils {
                 });
     }
 
-    public static void getMainData(String url){
+    //contenido del webview en mainactivity.
+    public static void getMainData(String url) {
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
                     String data = "";
+                    String reserva = "";
                     Document doc = Jsoup.connect(url).get();
                     Elements elements = doc.getAllElements();
                     for (Element element : elements) {
@@ -246,8 +248,12 @@ public class ServiceUtils {
                             break;
                         }
                     }
+                    Elements inputs = doc.select("input[name=Reserva]");
+                    reserva = inputs.get(0).val();
+
                     MainViewEvent event = new MainViewEvent();
                     event.setContent(data);
+                    event.setReserva(reserva);
                     EventBus.getDefault().post(event);
                 } catch (Exception e) {
                     e.printStackTrace();
