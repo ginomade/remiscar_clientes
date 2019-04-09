@@ -249,8 +249,9 @@ public class ServiceUtils {
                         }
                     }
                     Elements inputs = doc.select("input[name=Reserva]");
-                    reserva = inputs.get(0).val();
-
+                    if (!inputs.isEmpty()) {
+                        reserva = inputs.get(0).val();
+                    }
                     MainViewEvent event = new MainViewEvent();
                     event.setContent(data);
                     event.setReserva(reserva);
