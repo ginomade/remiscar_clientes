@@ -24,7 +24,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class PaymentActivity extends AppCompatActivity {
 
-    private static final String PREFERENCE_ID = "99103401-f93caed8-88f0-4e98-a9f7-6c01edc72e10";
     private static final String PUBLIC_KEY = "TEST-ad365c37-8012-4014-84f5-6c895b3f8e0a";
     private static int REQUEST_CODE = 11;
     Context context;
@@ -34,7 +33,7 @@ public class PaymentActivity extends AppCompatActivity {
     Button vPayButton;
     ProgressBar vProgress;
 
-    String checkoutPreferenceId = PREFERENCE_ID;
+    String checkoutPreferenceId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
