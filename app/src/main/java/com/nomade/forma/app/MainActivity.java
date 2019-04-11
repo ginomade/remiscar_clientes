@@ -411,20 +411,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         ServiceUtils.getMainData(url);
     }
 
-    private void extractReserva(String doc) {
-        //int value = doc.indexOf("Reserva");
-        if (!doc.equals("")) {
-            Log.w("remiscar", "Reserva " + doc);
-            //Log.w("remiscar", "RET MAIN -" + doc);
-        }
-        enableButtonPagos(!doc.equals(""));
-        guardarReserva(doc);
-    }
-
     @Subscribe()
     public void processWebview(MainViewEvent data) {
         webContent = data.getContent();
-        extractReserva(data.getReserva());
+
+        enableButtonPagos(!data.getEmpresa().equals(""));
+        guardarReserva(data.getReserva());
     }
 
     private void loadWebView(){

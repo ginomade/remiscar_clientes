@@ -243,6 +243,7 @@ public class ServiceUtils {
                 try {
                     String data = "";
                     String reserva = "";
+                    String empresa = "";
                     Document doc = Jsoup.connect(finalUrl).get();
                     Elements elements = doc.getAllElements();
                     for (Element element : elements) {
@@ -253,11 +254,16 @@ public class ServiceUtils {
                     }
                     Elements inputs = doc.select("input[name=Empresa]");
                     if (!inputs.isEmpty()) {
-                        reserva = inputs.get(0).val();
+                        empresa = inputs.get(0).val();
+                    }
+                    Elements inputsReserva = doc.select("input[name=Reserva]");
+                    if (!inputsReserva.isEmpty()) {
+                        reserva = inputsReserva.get(0).val();
                     }
                     MainViewEvent event = new MainViewEvent();
                     event.setContent(data);
                     event.setReserva(reserva);
+                    event.setEmpresa(empresa);
                     EventBus.getDefault().post(event);
                 } catch (Exception e) {
                     e.printStackTrace();
