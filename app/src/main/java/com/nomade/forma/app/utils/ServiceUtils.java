@@ -232,7 +232,10 @@ public class ServiceUtils {
     }
 
     //contenido del webview en mainactivity.
-    public static void getMainData(String url) {
+    public static void getMainData(String imei, String telCompleto) {
+        String finalUrl = ServiceUtils.url_viajes
+                + "?IMEI=" + imei
+                + "&Celular=" + telCompleto;
         Thread thread = new Thread(new Runnable() {
 
             @Override
@@ -240,6 +243,38 @@ public class ServiceUtils {
                 try {
                     String data = "";
                     String reserva = "";
+                    Document doc = Jsoup.connect(finalUrl).get();
+                    Elements elements = doc.getAllElements();
+                    for (Element element : elements) {
+                        if (!element.select("tbody").isEmpty()) {
+                            data = element.outerHtml() + "<br/>";
+                            break;
+                        }
+                    }
+                    Elements inputs = doc.select("input[name=Empresa]");
+                    if (!inputs.isEmpty()) {
+                        reserva = inputs.get(0).val();
+                    }
+                    MainViewEvent event = new MainViewEvent();
+                    event.setContent(data);
+                    event.setReserva(reserva);
+                    EventBus.getDefault().post(event);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    public static void getMainData(String url) {
+
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    String data = "";
                     Document doc = Jsoup.connect(url).get();
                     Elements elements = doc.getAllElements();
                     for (Element element : elements) {
@@ -248,13 +283,9 @@ public class ServiceUtils {
                             break;
                         }
                     }
-                    Elements inputs = doc.select("input[name=Reserva]");
-                    if (!inputs.isEmpty()) {
-                        reserva = inputs.get(0).val();
-                    }
+
                     MainViewEvent event = new MainViewEvent();
                     event.setContent(data);
-                    event.setReserva(reserva);
                     EventBus.getDefault().post(event);
                 } catch (Exception e) {
                     e.printStackTrace();

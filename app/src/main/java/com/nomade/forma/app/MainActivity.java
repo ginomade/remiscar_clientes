@@ -19,6 +19,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -126,8 +127,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         guardarReserva(reservas);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        } else {
+            initialConfiguration();
+        }
+
         setLocationOff();
         setupWebView();
+        getMainData();
+        initWebview();
 
     }
 
@@ -320,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 @Override
                 public void onClick(View v) {
                     //manejar los mensajes al usuario con este boton
-                    setupWebView();
+                    initWebview();
                     resetBotonMensajes();
                 }
             });
@@ -345,7 +354,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @Override
         public void run() {
             ServiceUtils.getMensajes(mContext);
-            setupWebView();
+            getMainData();
+            initWebview();
             setBotonPedidoEstadoInicial();
 
             handler.postDelayed(runnableCode, REFRESH_TIME);
@@ -370,28 +380,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
 
-        ServiceUtils.getMainData(finalUrl);
+
 
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                vViajesView.loadUrl(url);
+                getMainData(url);
                 return false;
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    view.loadUrl(request.getUrl().toString());
+                    getMainData(request.getUrl().toString());
                 }
                 return false;
             }
 
+
         });
 
-        vViajesView.loadData(webContent, "text/html", "UTF-8");
+    }
 
+    private void getMainData(){
+        ServiceUtils.getMainData(imei, telCompleto);
+    }
+
+    private void getMainData(String url){
+        ServiceUtils.getMainData(url);
     }
 
     private void extractReserva(String doc) {
@@ -408,6 +425,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void processWebview(MainViewEvent data) {
         webContent = data.getContent();
         extractReserva(data.getReserva());
+    }
+
+    private void loadWebView(){
+        vViajesView.loadData(webContent, "text/html", "UTF-8");
+    }
+
+    private void initWebview(){
+        vViajesView.loadUrl(ServiceUtils.url_viajes
+                + "?IMEI=" + imei
+                + "&Celular=" + telCompleto);
     }
 
 
@@ -702,11 +729,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermissions();
-        } else {
-            initialConfiguration();
-        }
+        initialConfiguration();
+
         checkLocationServices();
 
         handler.post(runnableCode);
