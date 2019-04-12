@@ -136,6 +136,9 @@ public class PaymentActivity extends AppCompatActivity {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 setMessage("Resultado del pago: " + payment.getPaymentStatus());
+                ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
+                        "OK", payment.getId().toString());
+                vPayButton.setEnabled(false);
                 //Done!
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getExtras() != null
@@ -143,9 +146,15 @@ public class PaymentActivity extends AppCompatActivity {
                     final MercadoPagoError mercadoPagoError =
                             (MercadoPagoError) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_ERROR);
                     setMessage("Error: " + mercadoPagoError.getMessage());
+                    ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
+                            mercadoPagoError.getMessage(), "");
+                    vPayButton.setEnabled(false);
                     //Resolve error in checkout
                 } else {
                     //Resolve canceled checkout
+                    ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
+                            "CANCELED", "");
+                    vPayButton.setEnabled(false);
                 }
             }
         }

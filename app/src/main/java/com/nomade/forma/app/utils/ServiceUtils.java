@@ -36,6 +36,7 @@ public class ServiceUtils {
     private static String url_celu_bloqueado = base_url + "Mcelubloqueado.php";
     public static String url_privacy = "http://www.remiscar.com.ar/condiciones/";
     public static String url_payment_pref = base_url + "checkout.php";
+    public static String url_payment_confirmation = base_url + "checkout.php";
 
     public static void asUbicacion(Context context, String url_ubicacion) {
         Ion.with(context)
@@ -299,5 +300,32 @@ public class ServiceUtils {
             }
         });
         thread.start();
+    }
+
+    public static void sendPaymentConfirmation(Context context, String imei, String reserva,
+                                               String status, String paymentId) {
+        Log.w("remiscar", "sendPaymentConfirmation - " + imei + "-" + paymentId);
+        Ion.with(context)
+                .load(url_payment_confirmation)
+                .setBodyParameter("IMEI", imei)
+                .setBodyParameter("PAYMENTID", paymentId)
+                .setBodyParameter("RESERVAS", reserva)
+                .setBodyParameter("STATUS", status)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject data) {
+                        try {
+                            if (data != null) {
+                            } else {
+                                Log.d("Remiscar* ", "error en sendPaymentConfirmation.");
+                            }
+
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+
+                    }
+                });
     }
 }
