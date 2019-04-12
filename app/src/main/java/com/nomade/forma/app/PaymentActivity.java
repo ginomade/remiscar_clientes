@@ -137,7 +137,7 @@ public class PaymentActivity extends AppCompatActivity {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 setMessage("Resultado del pago: " + payment.getPaymentStatus());
                 ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
-                        "OK", payment.getId().toString());
+                        payment.getPaymentStatus(), payment.getId().toString());
                 vPayButton.setEnabled(false);
                 //Done!
             } else if (resultCode == RESULT_CANCELED) {
@@ -145,9 +145,17 @@ public class PaymentActivity extends AppCompatActivity {
                         && data.getExtras().containsKey(MercadoPagoCheckout.EXTRA_ERROR)) {
                     final MercadoPagoError mercadoPagoError =
                             (MercadoPagoError) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_ERROR);
+                    final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
+
+                    String error = "";
+                    if (payment != null) {
+                        error = payment.getPaymentStatus();
+                    } else {
+                        error = mercadoPagoError.getMessage();
+                    }
                     setMessage("Error: " + mercadoPagoError.getMessage());
                     ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
-                            mercadoPagoError.getMessage(), "");
+                            error, "");
                     vPayButton.setEnabled(false);
                     //Resolve error in checkout
                 } else {

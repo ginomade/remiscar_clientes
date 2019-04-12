@@ -36,7 +36,7 @@ public class ServiceUtils {
     private static String url_celu_bloqueado = base_url + "Mcelubloqueado.php";
     public static String url_privacy = "http://www.remiscar.com.ar/condiciones/";
     public static String url_payment_pref = base_url + "checkout.php";
-    public static String url_payment_confirmation = base_url + "checkout.php";
+    public static String url_payment_confirmation = base_url + "CobroMercadoPago.php";
 
     public static void asUbicacion(Context context, String url_ubicacion) {
         Ion.with(context)
@@ -308,9 +308,9 @@ public class ServiceUtils {
         Ion.with(context)
                 .load(url_payment_confirmation)
                 .setBodyParameter("IMEI", imei)
-                .setBodyParameter("PAYMENTID", paymentId)
-                .setBodyParameter("RESERVAS", reserva)
-                .setBodyParameter("STATUS", status)
+                .setBodyParameter("idcobro", paymentId)
+                .setBodyParameter("RESERVA", reserva)
+                .setBodyParameter("ESTADO", status)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
