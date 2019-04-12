@@ -2,7 +2,6 @@ package com.nomade.forma.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -152,7 +151,7 @@ public class PaymentActivity extends AppCompatActivity {
         }
     }
 
-    private void setMessage(String mess){
+    private void setMessage(String mess) {
         TextView vMessage = (TextView) findViewById(R.id.mp_results);
         vMessage.setVisibility(View.VISIBLE);
         vMessage.setText(mess);

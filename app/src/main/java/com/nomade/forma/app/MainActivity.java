@@ -19,7 +19,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -381,7 +380,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
 
 
-
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
             @Override
@@ -403,11 +401,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void getMainData(){
+    private void getMainData() {
         ServiceUtils.getMainData(imei, telCompleto);
     }
 
-    private void getMainData(String url){
+    private void getMainData(String url) {
         ServiceUtils.getMainData(url);
     }
 
@@ -419,11 +417,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         guardarReserva(data.getReserva());
     }
 
-    private void loadWebView(){
+    private void loadWebView() {
         vViajesView.loadData(webContent, "text/html", "UTF-8");
     }
 
-    private void initWebview(){
+    private void initWebview() {
         vViajesView.loadUrl(ServiceUtils.url_viajes
                 + "?IMEI=" + imei
                 + "&Celular=" + telCompleto);
