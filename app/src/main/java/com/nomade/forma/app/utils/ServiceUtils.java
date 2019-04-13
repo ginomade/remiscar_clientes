@@ -110,6 +110,7 @@ public class ServiceUtils {
     public static void sendReservas(Context context, String imei, String celu, String geo,
                                     String obs, String nombreUsuario) {
         Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-" + geo + "-" + obs + "-" + nombreUsuario);
+        //"-54.4802,-68.1721"
         Ion.with(context)
                 .load(url_origenreservas)
                 .setBodyParameter("submit", "submit")
