@@ -25,23 +25,14 @@ import java.net.URLEncoder;
 //pantalla de datos de viajes
 public class ReclamosActivity extends AppCompatActivity {
 
-    WebView mWebView;
     public String imei;
-    public String telefono;
-    public String prefijo;
     public Button Ret, send;
     String telCompleto = "";
-    EditText mensaje;
-    private static final String URL = "http://carlitosbahia.dynns.com/movil/reclamosMovil.php";
-    String TAG_SUCCESS = "result";
     LinearLayout ll_mensaje, ll_confirmacion;
     String tNombre, tApellido, tUsuario;
     Context mContext;
     SharedPrefsUtil sharedPrefs;
-
-    //JSONParser jsonParser = new JSONParser();
-
-    // String imei, resp;
+    EditText mensaje;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +41,6 @@ public class ReclamosActivity extends AppCompatActivity {
 
         mContext = ReclamosActivity.this;
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
-        //imei = settings.getString("imei", "");
         imei = sharedPrefs.getString("imei", "");
         telCompleto = sharedPrefs.getString("telefono", "");
         Log.e("Remiscar:", "Reclamos  - celu " + telCompleto);

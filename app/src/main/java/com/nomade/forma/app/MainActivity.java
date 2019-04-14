@@ -207,7 +207,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
                             } else {
 
-                                ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje, tUsuario);
+                                ServiceUtils.sendReservas(mContext, imei, telCompleto,
+                                        coordenadas, mensaje, tUsuario,
+                                        sharedPrefs.getString("dni", ""),
+                                        sharedPrefs.getString("email", ""));
                                 enviandoPedido = true;
                             }
                         }
@@ -252,7 +255,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
-            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario);
+            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario,
+                    sharedPrefs.getString("dni", ""),
+                    sharedPrefs.getString("email", ""));
         }
     }
 
@@ -412,8 +417,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Subscribe()
     public void processWebview(MainViewEvent data) {
         webContent = data.getContent();
-
         enableButtonPagos(!data.getEmpresa().equals(""));
+        //enableButtonPagos(true);
         guardarReserva(data.getReserva());
     }
 

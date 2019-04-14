@@ -13,7 +13,8 @@ import com.nomade.forma.app.utils.SharedPrefsUtil;
 public class DatosActivity extends AppCompatActivity {
 
     EditText tNombre, tApellido, tDireccionCasa,
-            tDireccionTrabajo, tDireccionAlt, tTelefono;
+            tDireccionTrabajo, tDireccionAlt, tTelefono,
+            tDni, tEmail;
     Button bSend;
 
     Context mContext;
@@ -46,6 +47,8 @@ public class DatosActivity extends AppCompatActivity {
                     sharedPrefs.saveString("direccion_trabajo", tDireccionTrabajo.getText().toString());
                     sharedPrefs.saveString("direccion_alt", tDireccionAlt.getText().toString());
                     sharedPrefs.saveString("telefono", tTelefono.getText().toString());
+                    sharedPrefs.saveString("dni", tDni.getText().toString());
+                    sharedPrefs.saveString("email", tEmail.getText().toString());
                     Toast.makeText(mContext, "Datos Guardados.", Toast.LENGTH_LONG).show();
                     finish();
                 }
@@ -60,6 +63,9 @@ public class DatosActivity extends AppCompatActivity {
         tDireccionTrabajo.setText(sharedPrefs.getString("direccion_trabajo", ""));
         tDireccionAlt.setText(sharedPrefs.getString("direccion_alt", ""));
         tTelefono.setText(sharedPrefs.getString("telefono", ""));
+        tEmail.setText(sharedPrefs.getString("dni", ""));
+        tDni.setText(sharedPrefs.getString("email", ""));
+
     }
 
     private void initViewElements() {
@@ -69,6 +75,8 @@ public class DatosActivity extends AppCompatActivity {
         tDireccionTrabajo = (EditText) findViewById(R.id.editDomTrabajo);
         tDireccionAlt = (EditText) findViewById(R.id.editDomAlt);
         tTelefono = (EditText) findViewById(R.id.editTelefono);
+        tDni = (EditText) findViewById(R.id.editDNI);
+        tEmail = (EditText) findViewById(R.id.editEmail);
         bSend = (Button) findViewById(R.id.buttonSend);
 
     }

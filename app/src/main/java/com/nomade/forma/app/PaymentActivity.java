@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -136,8 +137,11 @@ public class PaymentActivity extends AppCompatActivity {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 setMessage("Resultado del pago: " + payment.getPaymentStatus());
+                Log.w("remiscar", "-----precio " + String.valueOf(payment.getTransactionDetails().getNetReceivedAmount()));
+
                 ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
-                        payment.getPaymentStatus(), payment.getId().toString());
+                        payment.getPaymentStatus(), payment.getPaymentStatusDetail(), payment.getId().toString(),
+                        String.valueOf(payment.getTransactionDetails().getNetReceivedAmount()));
                 vPayButton.setEnabled(false);
                 //Done!
             } else if (resultCode == RESULT_CANCELED) {
@@ -155,13 +159,13 @@ public class PaymentActivity extends AppCompatActivity {
                     }
                     setMessage("Error: " + mercadoPagoError.getMessage());
                     ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
-                            error, "");
+                            error, "", "", "");
                     vPayButton.setEnabled(false);
                     //Resolve error in checkout
                 } else {
                     //Resolve canceled checkout
                     ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
-                            "CANCELED", "");
+                            "CANCELED", "", "", "");
                     vPayButton.setEnabled(false);
                 }
             }

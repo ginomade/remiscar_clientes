@@ -108,7 +108,8 @@ public class ServiceUtils {
 
     //envio del pedido a origenreservas.php
     public static void sendReservas(Context context, String imei, String celu, String geo,
-                                    String obs, String nombreUsuario) {
+                                    String obs, String nombreUsuario,
+                                    String dni, String email) {
         Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-" + geo + "-" + obs + "-" + nombreUsuario);
         //"-54.4802,-68.1721"
         Ion.with(context)
@@ -119,6 +120,8 @@ public class ServiceUtils {
                 .setBodyParameter("Geoposicion", geo)
                 .setBodyParameter("Observaciones", obs)
                 .setBodyParameter("Pasajero", nombreUsuario)
+                .setBodyParameter("DNI", dni)
+                .setBodyParameter("EMAIL", email)
                 .asString(Charset.forName("iso-8859-1"))
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -304,14 +307,18 @@ public class ServiceUtils {
     }
 
     public static void sendPaymentConfirmation(Context context, String imei, String reserva,
-                                               String status, String paymentId) {
+                                               String status,
+                                               String statusDetail,
+                                               String paymentId,
+                                               String importeCobrado) {
         Log.w("remiscar", "sendPaymentConfirmation - " + imei + "-" + paymentId);
         Ion.with(context)
-                .load(url_payment_confirmation)
+                .load(url_payment_confirmation + "?ImporteCobrado=" + importeCobrado)
                 .setBodyParameter("IMEI", imei)
                 .setBodyParameter("idcobro", paymentId)
                 .setBodyParameter("RESERVA", reserva)
-                .setBodyParameter("ESTADO", status)
+                .setBodyParameter("Status", status)
+                .setBodyParameter("StatusDetail", statusDetail)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
