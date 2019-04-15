@@ -519,6 +519,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void enableButtonPagos(boolean enable) {
         if (vBtnPagos != null) {
             vBtnPagos.setEnabled(enable);
+            vBtnPagos.setText(enable? "Pagar" : "Mercado Pago");
+            vBtnPagos.setTextSize(enable? 22f : 16f);
+
         }
     }
 
