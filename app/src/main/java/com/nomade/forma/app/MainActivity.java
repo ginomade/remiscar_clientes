@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         getMainData();
         initWebview();
 
+        enableButtonPagos(false);
+
     }
 
     private void initDatosUsuario() {
@@ -229,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 startActivity(intent);
             }
         });
-        enableButtonPagos(false);
     }
 
     private void setBotonPedidoEstadoInicial() {
