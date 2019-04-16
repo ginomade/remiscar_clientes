@@ -133,9 +133,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:background="@drawable/selector_button_background"
-                android:text="Pagar"
                 android:textColor="#d5d9ea"
-                android:textSize="20sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

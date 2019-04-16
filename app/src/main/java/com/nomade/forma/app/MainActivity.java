@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
 
+    private boolean mEnablePayment = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -363,6 +365,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             initWebview();
             setBotonPedidoEstadoInicial();
 
+            enableButtonPagos(mEnablePayment);
+
             handler.postDelayed(runnableCode, REFRESH_TIME);
             getSingleLocation();
         }
@@ -418,8 +422,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Subscribe()
     public void processWebview(MainViewEvent data) {
         webContent = data.getContent();
-        enableButtonPagos(!data.getEmpresa().equals(""));
-        //enableButtonPagos(true);
+
+        mEnablePayment = !data.getEmpresa().equals("");
         guardarReserva(data.getReserva());
     }
 
@@ -519,8 +523,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void enableButtonPagos(boolean enable) {
         if (vBtnPagos != null) {
             vBtnPagos.setEnabled(enable);
-            vBtnPagos.setText(enable? "Pagar" : "Mercado Pago");
-            vBtnPagos.setTextSize(enable? 22f : 16f);
+            vBtnPagos.setText(enable ? "Pagar" : "Mercado Pago");
+            vBtnPagos.setTextSize(enable ? 22f : 16f);
 
         }
     }
@@ -733,6 +737,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         checkLocationServices();
 
         handler.post(runnableCode);
+
+        mEnablePayment = false;
 
         if (locationHelper != null) {
             locationHelper.onResume(this);
