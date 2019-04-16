@@ -3,187 +3,206 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#d5d9ea"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.nomade.forma.app.MainActivity"
-    android:background="#d5d9ea">
+    tools:context="com.nomade.forma.app.MainActivity">
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F5F6FF">
+
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="4dp" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Indique origen del viaje:"
+            android:textIsSelectable="false"
+            android:textSize="22dp"
+            android:typeface="sans" />
+
+        <LinearLayout
+            android:id="@+id/ll_botones"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#d5d9ea">
+            android:layout_height="60dp"
+            android:layout_below="@+id/textView"
+            android:layout_alignParentStart="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="4dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Indique origen del viaje:"
-                android:id="@+id/textView"
-                android:layout_gravity="center_horizontal"
-                android:typeface="sans"
-                android:textIsSelectable="false"
-                android:textSize="22dp" />
-
-            <LinearLayout
-                android:id="@+id/ll_botones"
+            <RelativeLayout
+                android:id="@+id/buttonHome"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_alignParentStart="true"
-                android:focusableInTouchMode="true"
-                android:layout_below="@+id/textView"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_button_background">
 
-                <RelativeLayout
-                    android:id="@+id/buttonHome"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/selector_button_background">
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_home_white_24dp" />
+            </RelativeLayout>
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_home_white_24dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/buttonWork"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/selector_button_background">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_work_white_24dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/buttonOtro"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/selector_button_background">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_youtube_searched_for_white_24dp" />
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Otro:"
-                android:id="@+id/textViewOtros"
-                android:typeface="sans"
-                android:layout_below="@id/ll_botones"
-                android:textIsSelectable="false"
-                android:textSize="18sp" />
-
-            <EditText
+            <RelativeLayout
+                android:id="@+id/buttonWork"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:inputType="textMultiLine"
-                android:layout_below="@id/textViewOtros"
-                android:ems="10"
-                android:id="@+id/editTextMens"
-                android:layout_gravity="center_horizontal"
-                android:background="#dbedef" />
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_button_background">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_work_white_24dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/buttonOtro"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_button_background">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_youtube_searched_for_white_24dp" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewOtros"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_botones"
+            android:text="Otro:"
+            android:textIsSelectable="false"
+            android:textSize="18sp"
+            android:typeface="sans" />
+
+        <EditText
+            android:id="@+id/editTextMens"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/textViewOtros"
+            android:layout_gravity="center_horizontal"
+            android:background="#dbedef"
+            android:ems="10"
+            android:hint="Indique otro lugar de origen"
+            android:inputType="textMultiLine" />
+
+
+        <LinearLayout
+            android:id="@+id/midButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTextMens"
+            android:orientation="horizontal">
 
             <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Solicitar Movil"
                 android:id="@+id/buttonEnviar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_below="@id/editTextMens"
+                android:layout_margin="5dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
                 android:background="@drawable/selector_button_background"
+                android:text="Solicitar Movil"
                 android:textColor="#d5d9ea"
                 android:textSize="22sp"
-                android:layout_marginTop="12dp"
-                android:layout_margin="5dp"
                 android:textStyle="bold" />
 
-            <FrameLayout
-                android:id="@+id/fl_location_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@id/buttonEnviar"
-                android:background="@color/wallet_hint_foreground_holo_light"/>
-
-            <WebView
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/buttonPagos"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/buttonEnviar"
-                android:layout_marginTop="12dp"
-                android:layout_above="@id/buttonsContainer"
-                android:id="@+id/wv_mensajes"/>
+                android:layout_weight="0.5"
+                android:background="@drawable/selector_button_background"
+                android:textColor="#d5d9ea"
+                android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mensaje_bloqueado"
-                android:id="@+id/textBloqueado"
-                android:typeface="sans"
-                android:layout_below="@id/buttonEnviar"
-                android:textIsSelectable="false"
-                android:textSize="22sp"
-                android:visibility="gone"/>
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/buttonsContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_alignParentBottom="true">
+        <FrameLayout
+            android:id="@+id/fl_location_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/midButtons"
+            android:background="@color/wallet_hint_foreground_holo_light" />
 
-                <Button
-                    android:id="@+id/buttonMensajes"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_horizontal"
-                    android:background="#0288D1"
-                    android:text="Mensajes"
-                    android:layout_margin="5dp"
-                    android:textColor="#d5d9ea"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+        <WebView
+            android:id="@+id/wv_mensajes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/buttonsContainer"
+            android:layout_below="@id/midButtons"
+            android:layout_marginTop="12dp" />
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:text="Mis Datos"
-                    android:layout_margin="5dp"
-                    android:id="@+id/buttonDatos"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_horizontal"
-                    android:background="#0288D1"
-                    android:textColor="#d5d9ea"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="10dp" />
+        <TextView
+            android:id="@+id/textBloqueado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/midButtons"
+            android:text="@string/mensaje_bloqueado"
+            android:textIsSelectable="false"
+            android:textSize="22sp"
+            android:typeface="sans"
+            android:visibility="gone" />
 
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/buttonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonMensajes"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="#0288D1"
+                android:text="Mensajes"
+                android:textColor="#d5d9ea"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/buttonDatos"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="#0288D1"
+                android:text="Mis Datos"
+                android:textColor="#d5d9ea"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
 
-
-        </RelativeLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

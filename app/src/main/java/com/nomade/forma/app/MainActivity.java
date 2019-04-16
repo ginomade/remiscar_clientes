@@ -46,6 +46,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.JsonObject;
 import com.nomade.forma.app.events.BloqueadoEvent;
+import com.nomade.forma.app.events.MainViewEvent;
 import com.nomade.forma.app.events.MensajesEvent;
 import com.nomade.forma.app.events.ReservasEvent;
 import com.nomade.forma.app.events.UbicacionEvent;
@@ -76,8 +77,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public TextView textBloqueado;
     public String estadoWifi = "0";
     public String coordenadas = "";
+    public String reservas = "";
     String telCompleto = "";
     int flg_mens = 0; // flag para mensajes
+
+    String webContent = "";
 
     private boolean pedidoEnviado = false;
     private boolean enviandoPedido = false;
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String tNombre, tApellido, tDireccionCasa,
             tDireccionTrabajo, tDireccionAlt, tUsuario;
 
-    Button vButtonDatos;
+    Button vButtonDatos, vBtnPagos;
 
     String[] mPermission = {Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.INTERNET,
@@ -107,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Manifest.permission.ACCESS_FINE_LOCATION};
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
+
+    private boolean mEnablePayment = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,12 +122,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
+        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
 
-
+        reservas = "";
+        guardarReserva(reservas);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-        sharedPrefs = SharedPrefsUtil.getInstance(mContext);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        } else {
+            initialConfiguration();
+        }
+
         setLocationOff();
+        setupWebView();
+        getMainData();
+        initWebview();
+
+        enableButtonPagos(false);
+
     }
 
     private void initDatosUsuario() {
@@ -132,6 +151,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tDireccionAlt = sharedPrefs.getString("direccion_alt", "");
         telCompleto = sharedPrefs.getString("telefono", "");
         tUsuario = tNombre + " " + tApellido;
+    }
+
+    private void guardarReserva(String reserva) {
+        sharedPrefs.saveString("reserva", reserva);
+        reservas = reserva;
     }
 
     private void setBotonesEnvio() {
@@ -187,7 +211,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
                             } else {
 
-                                ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, mensaje, tUsuario);
+                                ServiceUtils.sendReservas(mContext, imei, telCompleto,
+                                        coordenadas, mensaje, tUsuario,
+                                        sharedPrefs.getString("dni", ""),
+                                        sharedPrefs.getString("email", ""));
                                 enviandoPedido = true;
                             }
                         }
@@ -195,6 +222,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 } catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(MainActivity.this, "No se puede enviar el pedido.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        vBtnPagos = (Button) findViewById(R.id.buttonPagos);
+        vBtnPagos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PaymentActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -222,7 +258,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
-            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario);
+            ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario,
+                    sharedPrefs.getString("dni", ""),
+                    sharedPrefs.getString("email", ""));
         }
     }
 
@@ -298,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 @Override
                 public void onClick(View v) {
                     //manejar los mensajes al usuario con este boton
-                    setupWebView();
+                    initWebview();
                     resetBotonMensajes();
                 }
             });
@@ -323,8 +361,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @Override
         public void run() {
             ServiceUtils.getMensajes(mContext);
-            setupWebView();
+            getMainData();
+            initWebview();
             setBotonPedidoEstadoInicial();
+
+            enableButtonPagos(mEnablePayment);
 
             handler.postDelayed(runnableCode, REFRESH_TIME);
             getSingleLocation();
@@ -348,29 +389,50 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         WebSettings webSettings = vViajesView.getSettings();
         webSettings.setJavaScriptEnabled(true); // Enable Javascript.
 
+
         vViajesView.setWebViewClient(new WebViewClient() {
             // you tell the webclient you want to catch when a url is about to load
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                vViajesView.loadUrl(url);
+                getMainData(url);
                 return false;
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    view.loadUrl(request.getUrl().toString());
+                    getMainData(request.getUrl().toString());
                 }
                 return false;
             }
 
+
         });
 
-
-        Log.w("Remiscar", "viajes: " + finalUrl);
-        vViajesView.loadUrl(finalUrl);
     }
 
+    private void getMainData() {
+        ServiceUtils.getMainData(imei, telCompleto);
+    }
+
+    private void getMainData(String url) {
+        ServiceUtils.getMainData(url);
+    }
+
+    @Subscribe()
+    public void processWebview(MainViewEvent data) {
+        webContent = data.getContent();
+
+        //se habilita el boton de pago cuando el campo empresa es igual a 430.
+        mEnablePayment = data.getEmpresa().equals("430");
+        guardarReserva(data.getReserva());
+    }
+
+    private void initWebview() {
+        vViajesView.loadUrl(ServiceUtils.url_viajes
+                + "?IMEI=" + imei
+                + "&Celular=" + telCompleto);
+    }
 
     private void checkPermissions() {
         try {
@@ -454,6 +516,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    private void enableButtonPagos(boolean enable) {
+        if (vBtnPagos != null) {
+            vBtnPagos.setEnabled(enable);
+            vBtnPagos.setText(enable ? "Pagar" : "Mercado Pago");
+            vBtnPagos.setTextSize(enable ? 22f : 16f);
+
+        }
+    }
+
     public String getMacAdd() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
@@ -487,6 +558,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+
         } else if (id == R.id.action_reclamos) {
             irAReclamos();
         } else if (id == R.id.action_privacy) {
@@ -656,14 +728,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermissions();
-        } else {
-            initialConfiguration();
-        }
+        initialConfiguration();
+
         checkLocationServices();
 
         handler.post(runnableCode);
+
+        mEnablePayment = false;
 
         if (locationHelper != null) {
             locationHelper.onResume(this);
@@ -683,8 +754,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location != null) {
+        if (location != null) {
             String str = location.getLatitude() + "," + location.getLongitude();
+            //TEST DATA 54°48'02.1"S 68°17'21.9"W -54.4802,-68.1721
             coordenadas = str;
             Log.d("Remiscar ", " - set location -" + str);
             setLocationOn();
@@ -694,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getSingleLocation() {
         if (locationHelper != null) {
             Location singleLocation = locationHelper.getLastLocation();
-            if(singleLocation != null) {
+            if (singleLocation != null) {
                 String str = singleLocation.getLatitude() + "," + singleLocation.getLongitude();
                 coordenadas = str;
             }
@@ -702,27 +774,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void checkLocationServices(){
-        LocationManager lm = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+    private void checkLocationServices() {
+        LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
         boolean network_enabled = false;
 
         try {
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
-        if(!gps_enabled && !network_enabled) {
+        if (!gps_enabled && !network_enabled) {
             // notify user
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             dialog.setMessage("Activar localización");
             dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     mContext.startActivity(myIntent);
                     //get gps
                 }
