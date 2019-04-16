@@ -423,7 +423,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void processWebview(MainViewEvent data) {
         webContent = data.getContent();
 
-        mEnablePayment = !data.getEmpresa().equals("");
+        //se habilita el boton de pago cuando el campo empresa es igual a 430.
+        mEnablePayment = data.getEmpresa().equals("430");
         guardarReserva(data.getReserva());
     }
 

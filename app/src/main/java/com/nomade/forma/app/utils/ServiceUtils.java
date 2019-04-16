@@ -117,7 +117,7 @@ public class ServiceUtils {
                 .setBodyParameter("submit", "submit")
                 .setBodyParameter("IMEI", imei)
                 .setBodyParameter("Celular", celu)
-                .setBodyParameter("Geoposicion", "-54.4802,-68.1721")
+                .setBodyParameter("Geoposicion", geo)
                 .setBodyParameter("Observaciones", obs)
                 .setBodyParameter("Pasajero", nombreUsuario)
                 .setBodyParameter("DNI", dni)
