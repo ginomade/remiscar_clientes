@@ -4,59 +4,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F6FF"
     tools:context=".PaymentActivity">
 
+    <ImageView
+        android:id="@+id/MPIcon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/px_ico_card_mercadopagocard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Iniciar pago a traves de MercadoPago"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/payButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/MPIcon" />
 
     <Button
         android:id="@+id/payButton"
         android:layout_width="315dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="161dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="162dp"
-        android:layout_marginBottom="620dp"
         android:text="Pagar"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/mp_results"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView5" />
+
 
     <TextView
         android:id='@+id/mp_results'
         android:layout_width='match_parent'
         android:layout_height='wrap_content'
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="512dp"
-        android:paddingTop='50dp'
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:text="Mensajes"
         android:textAlignment="center"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/progressBar2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/payButton" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:text="Iniciar pago a traves de MercadoPago"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/payButton"
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progressBar2"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="533dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/payButton" />
+
 </android.support.constraint.ConstraintLayout>

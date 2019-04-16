@@ -13,7 +13,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#d5d9ea">
+        android:background="#F5F6FF">
 
         <TextView
             android:layout_width="1dp"
@@ -103,6 +103,7 @@
             android:layout_gravity="center_horizontal"
             android:background="#dbedef"
             android:ems="10"
+            android:hint="Indique otro lugar de origen"
             android:inputType="textMultiLine" />
 
 

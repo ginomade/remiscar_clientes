@@ -50,7 +50,7 @@ public class ServiceUtils {
                             event.setObject(result);
                             EventBus.getDefault().post(event);
                         } else {
-                            Log.d("Remiscar* ", "error en asLocation.");
+                            Log.w("Remiscar* ", "error en asLocation.");
                         }
 
                     }
@@ -70,7 +70,7 @@ public class ServiceUtils {
                             event.setObject(result);
                             EventBus.getDefault().post(event);
                         } else {
-                            Log.d("Remiscar* ", "error en validar bloqueados.");
+                            Log.w("Remiscar* ", "error en validar bloqueados.");
                         }
 
                     }
@@ -89,13 +89,13 @@ public class ServiceUtils {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject result) {
-                            Log.e("Remiscar ", "mensajes - " + result);
+                            //Log.e("Remiscar ", "mensajes - " + result);
                             if (result != null) {
                                 MensajesEvent event = new MensajesEvent();
                                 event.setObject(result);
                                 EventBus.getDefault().post(event);
                             } else {
-                                Log.d("Remiscar* ", "error en respuesta de mensajes.");
+                                Log.w("Remiscar* ", "error en respuesta de mensajes.");
                             }
 
                         }
@@ -126,14 +126,14 @@ public class ServiceUtils {
                 .setCallback(new FutureCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar ", "Login  - " + result);
+                        //Log.e("Remiscar ", "Login  - " + result);
 
                         if (result != null) {
                             ReservasEvent event = new ReservasEvent();
                             event.setDataString(result);
                             EventBus.getDefault().post(event);
                         } else {
-                            Log.d("Remiscar* ", "error en respuesta de mensajes.");
+                            Log.w("Remiscar* ", "error en respuesta de mensajes.");
                         }
                     }
                 });
@@ -149,7 +149,7 @@ public class ServiceUtils {
                 .setCallback(new FutureCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar ", "viajes  - " + result);
+
                         try {
                             if (result.equals("ok")) {
 
@@ -165,7 +165,7 @@ public class ServiceUtils {
                                 event.setDataString(result);
                                 EventBus.getDefault().post(event);
                             } else {
-                                Log.d("Remiscar* ", "error en respuesta de viajes.");
+                                Log.w("Remiscar* ", "error en respuesta de viajes.");
                             }
 
                         } catch (Exception e1) {
@@ -195,7 +195,7 @@ public class ServiceUtils {
                                 event.setObject(data);
                                 EventBus.getDefault().post(event);
                             } else {
-                                Log.d("Remiscar* ", "error en getMPPreferenceId.");
+                                Log.w("Remiscar* ", "error en getMPPreferenceId.");
                             }
 
                         } catch (Exception e1) {
@@ -209,7 +209,7 @@ public class ServiceUtils {
     public static void getReclamos(Context context, String imei, String celu, String mensaje, String nombreUsuario) {
         String finalUrl = url_reclamosMovil + "?IMEI=" + imei + "&Celular=" + celu
                 + "&Descripcion=" + mensaje + "&Pasajero=" + nombreUsuario;
-        Log.w("remiscar", "getReclamos - " + finalUrl);
+        Log.d("remiscar", "getReclamos - " + finalUrl);
         Ion.with(context)
                 .load(url_reclamosMovil)
                 .setBodyParameter("IMEI", imei)
@@ -220,7 +220,7 @@ public class ServiceUtils {
                 .setCallback(new FutureCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result) {
-                        Log.e("Remiscar:", "Reclamos  - " + result);
+                        Log.d("Remiscar:", "Reclamos  - " + result);
                         try {
 
                             ReclamosEvent event = new ReclamosEvent();
@@ -311,7 +311,7 @@ public class ServiceUtils {
                                                String statusDetail,
                                                String paymentId,
                                                String importeCobrado) {
-        Log.w("remiscar", "sendPaymentConfirmation - " + imei + "-" + paymentId);
+        Log.d("remiscar", "sendPaymentConfirmation - " + imei + "-" + paymentId);
         Ion.with(context)
                 .load(url_payment_confirmation + "?ImporteCobrado=" + importeCobrado)
                 .setBodyParameter("IMEI", imei)
@@ -326,7 +326,7 @@ public class ServiceUtils {
                         try {
                             if (data != null) {
                             } else {
-                                Log.d("Remiscar* ", "error en sendPaymentConfirmation.");
+                                Log.w("Remiscar* ", "error en sendPaymentConfirmation.");
                             }
 
                         } catch (Exception e1) {

@@ -428,16 +428,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         guardarReserva(data.getReserva());
     }
 
-    private void loadWebView() {
-        vViajesView.loadData(webContent, "text/html", "UTF-8");
-    }
-
     private void initWebview() {
         vViajesView.loadUrl(ServiceUtils.url_viajes
                 + "?IMEI=" + imei
                 + "&Celular=" + telCompleto);
     }
-
 
     private void checkPermissions() {
         try {
@@ -761,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         if (location != null) {
             String str = location.getLatitude() + "," + location.getLongitude();
-            //54°48'02.1"S 68°17'21.9"W -54.4802,-68.1721
+            //TEST DATA 54°48'02.1"S 68°17'21.9"W -54.4802,-68.1721
             coordenadas = str;
             Log.d("Remiscar ", " - set location -" + str);
             setLocationOn();

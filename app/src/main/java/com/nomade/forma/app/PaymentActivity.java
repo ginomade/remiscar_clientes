@@ -73,7 +73,11 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void getPreferenceId() {
-        ServiceUtils.getMPPreferenceId(context, imei, telCompleto, reserva);
+        if(!reserva.equals("")){
+            ServiceUtils.getMPPreferenceId(context, imei, telCompleto, reserva);
+        }else{
+            Log.w("remiscar", "error en valor de reserva.");
+        }
     }
 
     public void submit() {
@@ -90,6 +94,7 @@ public class PaymentActivity extends AppCompatActivity {
         if (success == 0) {
             checkoutPreferenceId = result.get("preference_id").getAsString();
             vPayButton.setEnabled(true);
+            reserva = "";
         }
     }
 
@@ -137,7 +142,6 @@ public class PaymentActivity extends AppCompatActivity {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 setMessage("Resultado del pago: " + payment.getPaymentStatus());
-                Log.w("remiscar", "-----precio " + String.valueOf(payment.getTransactionDetails().getNetReceivedAmount()));
 
                 ServiceUtils.sendPaymentConfirmation(PaymentActivity.this, imei, reserva,
                         payment.getPaymentStatus(), payment.getPaymentStatusDetail(), payment.getId().toString(),
