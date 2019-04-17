@@ -94,7 +94,6 @@ public class PaymentActivity extends AppCompatActivity {
         if (success == 0) {
             checkoutPreferenceId = result.get("preference_id").getAsString();
             vPayButton.setEnabled(true);
-            reserva = "";
         }
     }
 

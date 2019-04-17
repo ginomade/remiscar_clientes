@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setLocationOff();
         setupWebView();
         getMainData();
-        initWebview();
+
 
         enableButtonPagos(false);
 
@@ -733,6 +733,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         checkLocationServices();
 
         handler.post(runnableCode);
+
+        initWebview();
 
         mEnablePayment = false;
 
