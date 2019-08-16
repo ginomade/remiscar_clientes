@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             initWebview();
             setBotonPedidoEstadoInicial();
 
-            enableButtonPagos(mEnablePayment);
+            enableButtonPagos(true);
 
             handler.postDelayed(runnableCode, REFRESH_TIME);
             getSingleLocation();
