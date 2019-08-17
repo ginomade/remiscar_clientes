@@ -57,12 +57,12 @@ public class PaymentActivity extends AppCompatActivity {
         telCompleto = sharedPrefs.getString("telefono", "");
         reserva = sharedPrefs.getString("reserva", "");
 
-        //TEST
-        //getPreferenceId();
+        getPreferenceId();
 
+        //TEST
         //
-        checkoutPreferenceId = "99103401-d7caa194-ad69-4866-9540-5d9f5f02d9eb";
-        vPayButton.setEnabled(true);
+        //checkoutPreferenceId = "99103401-d7caa194-ad69-4866-9540-5d9f5f02d9eb";
+        //vPayButton.setEnabled(true);
         //
     }
 
