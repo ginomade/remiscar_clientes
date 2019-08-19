@@ -109,8 +109,11 @@ public class ServiceUtils {
     //envio del pedido a origenreservas.php
     public static void sendReservas(Context context, String imei, String celu, String geo,
                                     String obs, String nombreUsuario,
-                                    String dni, String email) {
-        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-" + geo + "-" + obs + "-" + nombreUsuario);
+                                    String dni, String email,
+                                    boolean pagoConTarjeta) {
+        Log.w("remiscar", "sendReservas - " + imei + "-" + celu + "-"
+                + geo + "-" + obs + "-" + nombreUsuario
+        + "- tarjeta - " + pagoConTarjeta);
         //"-54.4802,-68.1721"
         Ion.with(context)
                 .load(url_origenreservas)
@@ -122,6 +125,7 @@ public class ServiceUtils {
                 .setBodyParameter("Pasajero", nombreUsuario)
                 .setBodyParameter("DNI", dni)
                 .setBodyParameter("EMAIL", email)
+                .setBodyParameter("Tarjeta", String.valueOf(pagoConTarjeta))
                 .asString(Charset.forName("iso-8859-1"))
                 .setCallback(new FutureCallback<String>() {
                     @Override

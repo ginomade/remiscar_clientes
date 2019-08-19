@@ -37,6 +37,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     RelativeLayout vWorkButton;
     RelativeLayout vOtrosButton;
     FrameLayout vLocIndicator;
+    CheckBox vCheckTarjeta;
 
     String tNombre, tApellido, tDireccionCasa,
             tDireccionTrabajo, tDireccionAlt, tUsuario;
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vHomeButton = (RelativeLayout) findViewById(R.id.buttonHome);
         vWorkButton = (RelativeLayout) findViewById(R.id.buttonWork);
         vOtrosButton = (RelativeLayout) findViewById(R.id.buttonOtro);
+        vCheckTarjeta = (CheckBox) findViewById(R.id.check_tarjeta);
 
         vHomeButton.setEnabled(!tDireccionCasa.equals(""));
         vWorkButton.setEnabled(!tDireccionTrabajo.equals(""));
@@ -214,7 +217,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 ServiceUtils.sendReservas(mContext, imei, telCompleto,
                                         coordenadas, mensaje, tUsuario,
                                         sharedPrefs.getString("dni", ""),
-                                        sharedPrefs.getString("email", ""));
+                                        sharedPrefs.getString("email", ""),
+                                        vCheckTarjeta.isChecked());
                                 enviandoPedido = true;
                             }
                         }
@@ -260,7 +264,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
             ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario,
                     sharedPrefs.getString("dni", ""),
-                    sharedPrefs.getString("email", ""));
+                    sharedPrefs.getString("email", ""),
+                    vCheckTarjeta.isChecked());
         }
     }
 

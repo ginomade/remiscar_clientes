@@ -95,23 +95,39 @@
             android:textSize="18sp"
             android:typeface="sans" />
 
-        <EditText
-            android:id="@+id/editTextMens"
+        <LinearLayout
+            android:id="@+id/ll_mens_container"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:layout_below="@id/textViewOtros"
             android:layout_gravity="center_horizontal"
-            android:background="#dbedef"
-            android:ems="10"
-            android:hint="Indique otro lugar de origen"
-            android:inputType="textMultiLine" />
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/editTextMens"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:layout_gravity="center_horizontal"
+                android:background="#dbedef"
+                android:ems="10"
+                android:hint="Indique otro lugar de origen"
+                android:inputType="textMultiLine" />
 
+            <CheckBox
+                android:id="@+id/check_tarjeta"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Pago con tarjeta"
+                android:textAlignment="center"
+                android:textSize="22sp"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/midButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/editTextMens"
+            android:layout_below="@id/ll_mens_container"
             android:orientation="horizontal">
 
             <Button
