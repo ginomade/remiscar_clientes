@@ -38,6 +38,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -166,6 +167,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vWorkButton = (RelativeLayout) findViewById(R.id.buttonWork);
         vOtrosButton = (RelativeLayout) findViewById(R.id.buttonOtro);
         vCheckTarjeta = (CheckBox) findViewById(R.id.check_tarjeta);
+        vCheckTarjeta.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                sharedPrefs.saveBoolean("pagoConTarjeta", b);
+            }
+        });
+        vCheckTarjeta.setChecked(sharedPrefs.getBoolean("pagoConTarjeta", false));
 
         vHomeButton.setEnabled(!tDireccionCasa.equals(""));
         vWorkButton.setEnabled(!tDireccionTrabajo.equals(""));
