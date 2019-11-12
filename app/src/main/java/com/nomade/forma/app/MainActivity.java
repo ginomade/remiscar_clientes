@@ -189,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             // Signed in successfully, show authenticated UI.
             imei = account.getEmail();
+            sharedPrefs.saveString("imei", imei);
+            initialConfiguration();
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -338,6 +340,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             checkPermissions();
         }
 
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            imei = account.getEmail();
+            sharedPrefs.saveString("imei", imei);
+            initialConfiguration();
+        } else {
+            signIn();
+        }
+
     }
 
     private void initialConfiguration() {
@@ -345,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             initDatosUsuario();
 
-            boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
             if (imei.equals("")) {
                 Toast.makeText(mContext, "Error de sistema. No se puede obtener email.", Toast.LENGTH_LONG);
@@ -506,13 +516,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         mPermission, MY_PERMISSIONS_REQUEST);
 
             } else {
-                initialConfiguration();
-                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-                if (account != null) {
-                    imei = account.getEmail();
-                } else {
-                    signIn();
-                }
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -530,7 +535,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             // permission was granted.
 
-            initialConfiguration();
+            //initialConfiguration();
         } else {
 
             // permission denied.
