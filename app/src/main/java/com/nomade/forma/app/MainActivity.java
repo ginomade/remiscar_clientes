@@ -19,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -635,17 +634,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    //Obtener numero de imei
-    private String getPhoneImei() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            TelephonyManager mTelephonyManager;
-            mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            return mTelephonyManager.getDeviceId();
-        }
-        return "";
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
