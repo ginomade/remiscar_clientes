@@ -44,4 +44,6 @@ dependencies {
 
     implementation 'com.mercadopago.android.px:checkout:4.+'
     implementation 'org.jsoup:jsoup:1.11.3'
+
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
 }

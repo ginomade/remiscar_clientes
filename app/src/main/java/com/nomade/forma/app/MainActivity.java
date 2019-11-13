@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -20,11 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -45,7 +39,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonObject;
 import com.nomade.forma.app.events.BloqueadoEvent;
 import com.nomade.forma.app.events.MainViewEvent;
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public EditText editTextMens;
     public String telefono = "";
     public String prefijo = "";
-    public String imei;
+    public String imei = "";
     public Button buttonEnviarPedido;
     public Button buttonMensajes;
     public String url;
@@ -115,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private static final int MY_PERMISSIONS_REQUEST = 1;
 
+    static final int RC_SIGN_IN = 1122;
+    GoogleSignInClient mGoogleSignInClient;
+
     private boolean mEnablePayment = false;
 
     @Override
@@ -131,20 +140,66 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         guardarReserva(reservas);
         locationHelper = new GooglePlayServicesHelper(this, true);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermissions();
-        } else {
-            initialConfiguration();
-        }
 
         setLocationOff();
         setupWebView();
         getMainData();
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         enableButtonPagos(false);
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+
+        }
+        if (resultCode == Activity.RESULT_OK)
+            switch (requestCode) {
+                case RC_SIGN_IN:
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    handleSignInResult(task);
+
+                    break;
+            }
+
+    }
+
+    //region signin
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+            imei = account.getEmail();
+            sharedPrefs.saveString("imei", imei);
+            initialConfiguration();
+
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Toast.makeText(MainActivity.this, "Error en registro de usuario.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    //endregion
 
     private void initDatosUsuario() {
         tNombre = sharedPrefs.getString("nombre", "");
@@ -277,35 +332,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        }
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            imei = account.getEmail();
+            sharedPrefs.saveString("imei", imei);
+            initialConfiguration();
+        } else {
+            signIn();
+        }
+
+    }
+
     private void initialConfiguration() {
         try {
-            // identificador del equipo segun tipo
-            Configuration config = getResources().getConfiguration();
-            if (config.smallestScreenWidthDp >= 600) {
-                imei = getMacAdd();
-                sharedPrefs.saveString("imei", imei);
-                Log.v("Remiscar", "entro por tab");
-            } else {
-
-                //Si hay conexion de WIFI pongo el flag a 1.
-                if (isWifiOnline().equals("wifi")) {
-                    estadoWifi = "1";
-                }
-
-                //obtengo imei
-                imei = getPhoneImei();//"359781041848146"
-                sharedPrefs.saveString("imei", imei);
-                Log.i("Remiscar", "start imei " + imei);
-            }
 
             initDatosUsuario();
 
-
-            boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
             //validar celu bloqueado
             if (imei.equals("")) {
-                Toast.makeText(mContext, "Error de sistema. No se puede obtener imei.", Toast.LENGTH_LONG);
-                Log.e("remiscar", "error obteniendo imei.");
+                Toast.makeText(mContext, "Error de sistema. No se puede obtener email.", Toast.LENGTH_LONG);
+                Log.e("remiscar", "error obteniendo email.");
                 finish();
             } else {
                 ServiceUtils.validarImei(MainActivity.this);
@@ -462,7 +515,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         mPermission, MY_PERMISSIONS_REQUEST);
 
             } else {
-                initialConfiguration();
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -480,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             // permission was granted.
 
-            initialConfiguration();
+            //initialConfiguration();
         } else {
 
             // permission denied.
@@ -580,17 +634,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    //Obtener numero de imei
-    private String getPhoneImei() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            TelephonyManager mTelephonyManager;
-            mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            return mTelephonyManager.getDeviceId();
-        }
-        return "";
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -741,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
 
-        initialConfiguration();
+        //initialConfiguration();
 
         checkLocationServices();
 
