@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     GoogleSignInClient mGoogleSignInClient;
 
     private boolean mEnablePayment = false;
+    private boolean mEnablePedidos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,9 +231,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
         vCheckTarjeta.setChecked(sharedPrefs.getBoolean("pagoConTarjeta", false));
 
-        vHomeButton.setEnabled(!tDireccionCasa.equals(""));
-        vWorkButton.setEnabled(!tDireccionTrabajo.equals(""));
-        vOtrosButton.setEnabled(!tDireccionAlt.equals(""));
+        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos);
+        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos);
+        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos);
 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
+        buttonEnviarPedido.setEnabled(mEnablePedidos);
         enviandoPedido = true;
         setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
@@ -277,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
                             } else {
 
+                                disableBotonesPedidos();
                                 ServiceUtils.sendReservas(mContext, imei, telCompleto,
                                         coordenadas, mensaje, tUsuario,
                                         sharedPrefs.getString("dni", ""),
@@ -324,12 +327,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (pedidoEnviado) {
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
+            disableBotonesPedidos();
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
             ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario,
                     sharedPrefs.getString("dni", ""),
                     sharedPrefs.getString("email", ""),
                     vCheckTarjeta.isChecked());
         }
+    }
+
+    private void enableBotonesPedidos() {
+        mEnablePedidos = true;
+        setBotonesEnvio();
+    }
+
+    private void disableBotonesPedidos() {
+        mEnablePedidos = false;
+        setBotonesEnvio();
     }
 
     @Override
@@ -492,6 +506,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //se habilita el boton de pago cuando el campo empresa es igual a 430.
         mEnablePayment = data.getEmpresa().equals("430");
         guardarReserva(data.getReserva());
+        if(data.getReserva() != null && data.getReserva().isEmpty()){
+            enableBotonesPedidos();
+        }
     }
 
     private void initWebview() {
