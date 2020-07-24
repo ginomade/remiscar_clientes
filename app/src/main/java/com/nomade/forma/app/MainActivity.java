@@ -506,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //se habilita el boton de pago cuando el campo empresa es igual a 430.
         mEnablePayment = data.getEmpresa().equals("430");
         guardarReserva(data.getReserva());
-        if(data.getReserva() != null && !data.getReserva().isEmpty()){
+        if(data.getReserva() != null && !data.getReserva().equals("")){
             enableBotonesPedidos();
         }
     }
@@ -814,6 +814,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (locationHelper != null) {
             locationHelper.onResume(this);
         }
+
+        enableBotonesPedidos();
     }
 
     public static void hideKeyboard(Activity activity) {
