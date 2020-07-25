@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     GoogleSignInClient mGoogleSignInClient;
 
     private boolean mEnablePayment = false;
-    private boolean mEnablePedidos;
+    private boolean mEnablePedidos = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         mContext = MainActivity.this;
 
+        editTextMens = (EditText) findViewById(R.id.editTextMens);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
@@ -231,9 +232,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
         vCheckTarjeta.setChecked(sharedPrefs.getBoolean("pagoConTarjeta", false));
 
-        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos);
-        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos);
-        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos);
+        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos && !pedidoEnviado);
+        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos && !pedidoEnviado);
+        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos && !pedidoEnviado);
 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
-        buttonEnviarPedido.setEnabled(mEnablePedidos);
+        buttonEnviarPedido.setEnabled(mEnablePedidos && !pedidoEnviado);
         enviandoPedido = true;
         setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
@@ -378,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 ServiceUtils.validarImei(MainActivity.this);
             }
 
-            editTextMens = (EditText) findViewById(R.id.editTextMens);
+
             editTextMens.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -815,6 +816,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             locationHelper.onResume(this);
         }
 
+        initDatosUsuario();
         enableBotonesPedidos();
     }
 
