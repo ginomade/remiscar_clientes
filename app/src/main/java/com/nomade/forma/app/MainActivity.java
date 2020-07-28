@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String webContent = "";
 
     private boolean pedidoEnviado = false;
-    private boolean enviandoPedido = false;
 
     //tiempo de refresco de webview en milisegundos
     private static int REFRESH_TIME = 5000;
@@ -256,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
 
-        enviandoPedido = true;
         setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                         sharedPrefs.getString("dni", ""),
                                         sharedPrefs.getString("email", ""),
                                         vCheckTarjeta.isChecked());
-                                enviandoPedido = true;
+
                             }
                         }
                     }
@@ -315,10 +313,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void setBotonPedidoEstadoInicial() {
-        if (enviandoPedido) {
+        if (pedidoEnviado) {
             buttonEnviarPedido.setText("Solicitar Movil");
-            buttonEnviarPedido.setEnabled(false);
-            enviandoPedido = false;
+            buttonEnviarPedido.setEnabled(true);
+
             editTextMens.setText("");
             hideKeyboard(MainActivity.this);
         }
@@ -775,7 +773,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 pedidoEnviado = true;
                 buttonEnviarPedido.setEnabled(false);
                 buttonEnviarPedido.setText("Enviando");
-                enableBotonesPedidos();
             } else {
                 sharedPrefs.saveString("webresult", data.getDataString());
 
@@ -783,6 +780,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 vViajesView.loadData(webData, "text/html; charset=UTF-8", null);
 
             }
+            enableBotonesPedidos();
 
         } catch (Exception e1) {
             e1.printStackTrace();
