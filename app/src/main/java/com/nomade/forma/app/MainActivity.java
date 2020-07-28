@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         enableButtonPagos(false);
 
+        setBotonesEnvio();
+
     }
 
     @Override
@@ -293,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        setEstadoBotonesPedidos();
 
         vBtnPagos = (Button) findViewById(R.id.buttonPagos);
         vBtnPagos.setOnClickListener(new View.OnClickListener() {
@@ -306,10 +307,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void setEstadoBotonesPedidos() {
-        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos && !pedidoEnviado);
-        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos && !pedidoEnviado);
-        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos && !pedidoEnviado);
-        buttonEnviarPedido.setEnabled(mEnablePedidos && !pedidoEnviado);
+        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos);
+        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos);
+        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos);
+        buttonEnviarPedido.setEnabled(mEnablePedidos);
+        Log.w("remiscar", "***BOTONES***");
     }
 
     private void setBotonPedidoEstadoInicial() {
@@ -367,7 +369,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else {
             signIn();
         }
-        initialConfiguration();
 
     }
 
@@ -514,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mEnablePayment = data.getEmpresa().equals("430");
         guardarReserva(data.getReserva());
         if (data.getReserva() != null && !data.getReserva().equals("")) {
-            enableBotonesPedidos();
+            mEnablePedidos = true;
         }
     }
 
@@ -581,7 +582,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Log.e("Remiscar ", "Hay mensajes.");
                 pedidoEnviado = false;
                 setBotonPedidoEstadoInicial();
-                setEstadoBotonesPedidos();
                 if (flg_mens == 0) {
                     Toast.makeText(getApplicationContext(), "Hay nuevos mensajes para usted.", Toast.LENGTH_SHORT).show();
                     final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.c2answer);
@@ -770,12 +770,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void processReservas(ReservasEvent data) {
 
         try {
-            if (data.getDataString().equals("ok")) {
+            if (data.getDataString().contains("realizado")) {
                 Toast.makeText(getBaseContext(), "Pedido enviado.", Toast.LENGTH_LONG).show();
                 pedidoEnviado = true;
                 buttonEnviarPedido.setEnabled(false);
                 buttonEnviarPedido.setText("Enviando");
-                setEstadoBotonesPedidos();
+                enableBotonesPedidos();
             } else {
                 sharedPrefs.saveString("webresult", data.getDataString());
 
@@ -809,8 +809,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-
-        //initialConfiguration();
 
         checkLocationServices();
 
