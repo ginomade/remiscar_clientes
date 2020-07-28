@@ -364,10 +364,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (account != null) {
             imei = account.getEmail();
             sharedPrefs.saveString("imei", imei);
-            initialConfiguration();
         } else {
             signIn();
         }
+        initialConfiguration();
 
     }
 
