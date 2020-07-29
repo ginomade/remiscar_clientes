@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos);
         vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos);
         vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos);
-        buttonEnviarPedido.setEnabled(mEnablePedidos);
+        buttonEnviarPedido.setEnabled(mEnablePedidos && editTextMens.getText().toString().length() > 0);
         Log.w("remiscar", "***BOTONES***");
     }
 
@@ -389,16 +389,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     //nothing
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    buttonEnviarPedido.setEnabled(s.length() > 0);
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
                     //nothing
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
 
                 }
             });
@@ -820,6 +822,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             locationHelper.onResume(this);
         }
 
+        initialConfiguration();
         initDatosUsuario();
         enableBotonesPedidos();
     }
