@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String webContent = "";
 
     private boolean pedidoEnviado = false;
-    private boolean enviandoPedido = false;
 
     //tiempo de refresco de webview en milisegundos
     private static int REFRESH_TIME = 5000;
@@ -125,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     GoogleSignInClient mGoogleSignInClient;
 
     private boolean mEnablePayment = false;
+    private boolean mEnablePedidos = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         mContext = MainActivity.this;
 
+        editTextMens = (EditText) findViewById(R.id.editTextMens);
         vViajesView = (WebView) findViewById(R.id.wv_mensajes);
         vLocIndicator = (FrameLayout) findViewById(R.id.fl_location_indicator);
         sharedPrefs = SharedPrefsUtil.getInstance(mContext);
@@ -151,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         enableButtonPagos(false);
+
+        setBotonesEnvio();
 
     }
 
@@ -230,9 +233,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
         vCheckTarjeta.setChecked(sharedPrefs.getBoolean("pagoConTarjeta", false));
 
-        vHomeButton.setEnabled(!tDireccionCasa.equals(""));
-        vWorkButton.setEnabled(!tDireccionTrabajo.equals(""));
-        vOtrosButton.setEnabled(!tDireccionAlt.equals(""));
 
         vHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         buttonEnviarPedido = (Button) findViewById(R.id.buttonEnviar);
-        enviandoPedido = true;
+
         setBotonPedidoEstadoInicial();
         buttonEnviarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -277,12 +277,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 Toast.makeText(MainActivity.this, "Indique el número de celular.", Toast.LENGTH_SHORT).show();
                             } else {
 
+                                disableBotonesPedidos();
                                 ServiceUtils.sendReservas(mContext, imei, telCompleto,
                                         coordenadas, mensaje, tUsuario,
                                         sharedPrefs.getString("dni", ""),
                                         sharedPrefs.getString("email", ""),
                                         vCheckTarjeta.isChecked());
-                                enviandoPedido = true;
+
                             }
                         }
                     }
@@ -291,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+
 
         vBtnPagos = (Button) findViewById(R.id.buttonPagos);
         vBtnPagos.setOnClickListener(new View.OnClickListener() {
@@ -302,11 +304,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+    private void setEstadoBotonesPedidos() {
+        vHomeButton.setEnabled(!tDireccionCasa.equals("") && mEnablePedidos);
+        vWorkButton.setEnabled(!tDireccionTrabajo.equals("") && mEnablePedidos);
+        vOtrosButton.setEnabled(!tDireccionAlt.equals("") && mEnablePedidos);
+        buttonEnviarPedido.setEnabled(mEnablePedidos && editTextMens.getText().toString().length() > 0);
+        Log.w("remiscar", "***BOTONES***");
+    }
+
     private void setBotonPedidoEstadoInicial() {
-        if (enviandoPedido) {
+        if (pedidoEnviado) {
             buttonEnviarPedido.setText("Solicitar Movil");
-            buttonEnviarPedido.setEnabled(false);
-            enviandoPedido = false;
+            buttonEnviarPedido.setEnabled(true);
+
             editTextMens.setText("");
             hideKeyboard(MainActivity.this);
         }
@@ -324,12 +334,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (pedidoEnviado) {
             Toast.makeText(MainActivity.this, "Ya existe un pedido en curso.", Toast.LENGTH_SHORT).show();
         } else {
+            disableBotonesPedidos();
             Toast.makeText(MainActivity.this, "Enviando pedido a " + origen, Toast.LENGTH_SHORT).show();
             ServiceUtils.sendReservas(mContext, imei, telCompleto, coordenadas, origen, tUsuario,
                     sharedPrefs.getString("dni", ""),
                     sharedPrefs.getString("email", ""),
                     vCheckTarjeta.isChecked());
         }
+    }
+
+    private void enableBotonesPedidos() {
+        mEnablePedidos = true;
+        setEstadoBotonesPedidos();
+    }
+
+    private void disableBotonesPedidos() {
+        mEnablePedidos = false;
+        setEstadoBotonesPedidos();
     }
 
     @Override
@@ -343,7 +364,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (account != null) {
             imei = account.getEmail();
             sharedPrefs.saveString("imei", imei);
-            initialConfiguration();
         } else {
             signIn();
         }
@@ -364,21 +384,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 ServiceUtils.validarImei(MainActivity.this);
             }
 
-            editTextMens = (EditText) findViewById(R.id.editTextMens);
+
             editTextMens.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     //nothing
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    buttonEnviarPedido.setEnabled(s.length() > 0);
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
                     //nothing
+                    buttonEnviarPedido.setEnabled(mEnablePedidos && s.length() > 0);
 
                 }
             });
@@ -492,6 +514,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //se habilita el boton de pago cuando el campo empresa es igual a 430.
         mEnablePayment = data.getEmpresa().equals("430");
         guardarReserva(data.getReserva());
+        if (data.getReserva() != null && !data.getReserva().equals("")) {
+            mEnablePedidos = true;
+        }
     }
 
     private void initWebview() {
@@ -745,7 +770,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void processReservas(ReservasEvent data) {
 
         try {
-            if (data.getDataString().equals("ok")) {
+            if (data.getDataString().contains("realizado")) {
                 Toast.makeText(getBaseContext(), "Pedido enviado.", Toast.LENGTH_LONG).show();
                 pedidoEnviado = true;
                 buttonEnviarPedido.setEnabled(false);
@@ -757,6 +782,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 vViajesView.loadData(webData, "text/html; charset=UTF-8", null);
 
             }
+            enableBotonesPedidos();
 
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -784,8 +810,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         EventBus.getDefault().register(this);
 
-        //initialConfiguration();
-
         checkLocationServices();
 
         handler.post(runnableCode);
@@ -797,6 +821,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (locationHelper != null) {
             locationHelper.onResume(this);
         }
+
+        initialConfiguration();
+        initDatosUsuario();
+        enableBotonesPedidos();
     }
 
     public static void hideKeyboard(Activity activity) {
