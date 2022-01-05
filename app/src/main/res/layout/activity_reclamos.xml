@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#F5F6FF"
     android:orientation="vertical"
+    android:accessibilityPaneTitle="Pantalla de reclamos"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -17,6 +18,7 @@
         android:layout_marginTop="10dp"
         android:background="#0288D1"
         android:text="Volver"
+        android:contentDescription="Volver"
         android:textColor="#d5d9ea"
         android:textSize="30dp"
         android:textStyle="bold" />
@@ -56,6 +58,7 @@
             android:layout_marginTop="30dp"
             android:background="#0288D1"
             android:text="Enviar"
+            android:contentDescription="Enviar"
             android:textColor="#d5d9ea"
             android:textSize="30dp"
             android:textStyle="bold" />

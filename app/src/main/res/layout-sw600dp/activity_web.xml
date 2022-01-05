@@ -26,6 +26,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:text="Inicio"
+            android:contentDescription="Inicio"
             android:id="@+id/buttonRet"
             android:layout_gravity="center_horizontal"
             android:background="#0288D1"

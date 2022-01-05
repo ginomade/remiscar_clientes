@@ -4,6 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:accessibilityPaneTitle="Pantalla de novedades"
     tools:context="com.nomade.forma.app.MainActivity">
 
 
@@ -26,6 +27,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Inicio"
+            android:contentDescription="Inicio"
             android:id="@+id/buttonRet"
             android:layout_gravity="center_horizontal"
             android:background="#4863a0"

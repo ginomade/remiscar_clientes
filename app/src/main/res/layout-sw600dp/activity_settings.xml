@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:accessibilityPaneTitle="Pantalla de datos de contacto"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -64,28 +65,30 @@
         android:layout_centerHorizontal="true" />
 
     <Button
+        android:id="@+id/buttonLlamar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Llamar"
-        android:id="@+id/buttonLlamar"
         android:layout_below="@+id/textView4"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="46dp"
         android:background="#531500"
+        android:text="Llamar"
+        android:contentDescription="llamar"
         android:textColor="#fff4f4"
         android:textSize="30dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <Button
+        android:id="@+id/buttonSMS"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Enviar SMS"
-        android:id="@+id/buttonSMS"
-        android:background="#531500"
-        android:textColor="#fff4f4"
-        android:textSize="30dp"
-        android:textStyle="bold"
         android:layout_below="@+id/buttonLlamar"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:background="#531500"
+        android:text="Enviar SMS"
+        android:contentDescription="Enviar SMS"
+        android:textColor="#fff4f4"
+        android:textSize="30dp"
+        android:textStyle="bold" />
 </RelativeLayout>
