@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:accessibilityPaneTitle="Pantalla de datos de contacto"
     android:background="#F5F6FF"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -74,6 +75,7 @@
         android:layout_marginTop="46dp"
         android:background="#0288D1"
         android:text="Llamar"
+        android:contentDescription="llamar"
         android:textColor="#d5d9ea"
         android:textSize="30dp"
         android:textStyle="bold" />
@@ -85,6 +87,7 @@
         android:layout_below="@+id/buttonLlamar"
         android:layout_marginTop="10dp"
         android:background="#0288D1"
+        android:contentDescription="Enviar SMS"
         android:text="Enviar SMS"
         android:textColor="#d5d9ea"
         android:textSize="30dp"

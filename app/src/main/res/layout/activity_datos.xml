@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:accessibilityPaneTitle="Formulario de datos personales"
     tools:context="com.nomade.forma.app.DatosActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -71,6 +72,7 @@
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:contentDescription="Domicilio casa"
                 android:src="@drawable/ic_home_white_24dp" />
         </RelativeLayout>
 
@@ -103,6 +105,7 @@
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:contentDescription="domicilio trabajo"
                 android:src="@drawable/ic_work_white_24dp" />
         </RelativeLayout>
 
@@ -135,6 +138,7 @@
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:contentDescription="domicilio alternativo"
                 android:src="@drawable/ic_youtube_searched_for_white_24dp" />
         </RelativeLayout>
 
@@ -222,6 +226,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Guardar"
+            android:contentDescription="Guardar"
             android:textSize="22sp"
             android:textColor="#ffffff"
             android:background="#0288D1"

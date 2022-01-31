@@ -5,12 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F6FF"
+    android:accessibilityPaneTitle="Pantalla de pago"
     tools:context=".PaymentActivity">
 
     <ImageView
         android:id="@+id/MPIcon"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:contentDescription="Logo mercadopago"
         android:src="@drawable/px_ico_card_mercadopagocard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +39,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="162dp"
         android:text="Pagar"
+        android:contentDescription="Pagar"
         app:layout_constraintBottom_toTopOf="@id/mp_results"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,6 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:contentDescription="Cargando"
         android:layout_marginBottom="533dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
