@@ -168,15 +168,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             handleSignInResult(task);
 
         }
-        if (resultCode == Activity.RESULT_OK)
-            switch (requestCode) {
-                case RC_SIGN_IN:
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                    handleSignInResult(task);
-
-                    break;
-            }
-
     }
 
     //region signin
@@ -379,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (imei.equals("")) {
                 Toast.makeText(mContext, "Error de sistema. No se puede obtener email.", Toast.LENGTH_LONG);
                 Log.e("remiscar", "error obteniendo email.");
+                Thread.sleep(2000);
                 finish();
             } else {
                 ServiceUtils.validarImei(MainActivity.this);
@@ -551,6 +543,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED
@@ -617,12 +610,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    public String getMacAdd() {
+    /*public String getMacAdd() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         String macAddress = wInfo.getMacAddress();
         return macAddress;
-    }
+    }*/
 
     public boolean isOnline() {
         ConnectivityManager cm =

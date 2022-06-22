@@ -30,7 +30,8 @@ import java.nio.charset.Charset;
  */
 public class ServiceUtils {
 
-    public static String base_url = "http://carlitosbahia.dynns.com/movil/";
+    //public static String base_url = "http://carlitosbahia.dynns.com/movil/";
+    public static String base_url = "https://carlitosbahia.com.ar/movil/";
     private static String url_mensajes = base_url + "Mmensajes.php";
     private static String url_origenreservas = base_url + "origenreservas.php";
     public static String url_viajes = base_url + "origen.php";
